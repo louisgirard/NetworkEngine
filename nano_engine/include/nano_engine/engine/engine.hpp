@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
+#include <nano_engine/common.hpp>
 
-namespace nano_engine
+namespace nano_engine::engine
 {
 	class EngineImpl;
 	class Engine
@@ -18,9 +18,10 @@ namespace nano_engine
 		Engine(const Engine& other) = delete;
 		Engine(Engine&& other) = delete;
 
-		void Engine::ParseCommandLine(int argc, char* argv[]);
-		void Engine::Run();
-		void Engine::Stop();
+		void ParseCommandLine(int argc, char* argv[]);
+		void Startup();
+		void Run();
+		void Stop();
 
 	private:
 		Engine();
