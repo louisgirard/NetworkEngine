@@ -1,4 +1,5 @@
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <nano_engine/systems/fps_counter.hpp>
 
 namespace nano_engine::systems
@@ -13,7 +14,8 @@ namespace nano_engine::systems
 
 			if (m_totalMilli >= 1s)
 			{
-				std::cout << "FPS : " << m_frames << std::endl;
+				spdlog::debug("FPS : {}", m_frames);
+
 				m_frames = 0;
 				m_totalMilli = 0ms;
 			}
