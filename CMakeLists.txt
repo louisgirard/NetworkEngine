@@ -22,6 +22,7 @@ include("${CMAKE_BINARY_DIR}/conan.cmake")
 
 conan_cmake_run(
     REQUIRES spdlog/1.8.0
+             entt/3.5.1
     BASIC_SETUP CMAKE_TARGETS
     BUILD missing
 )
