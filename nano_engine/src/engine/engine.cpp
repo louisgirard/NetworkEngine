@@ -1,6 +1,8 @@
 #include <atomic>
 #include <vector>
 
+#include <spdlog/spdlog.h>
+
 #include <nano_engine/systems/system.hpp>
 #include <nano_engine/systems/fps_counter.hpp>
 #include <nano_engine/engine/engine.hpp>
@@ -27,6 +29,7 @@ namespace nano_engine::engine
 
 		void Startup()
 		{
+			spdlog::set_level(spdlog::level::debug);
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
 		}
 

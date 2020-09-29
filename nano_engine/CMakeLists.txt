@@ -15,3 +15,5 @@ set(NANO_ENGINE_SOURCES
 add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 target_include_directories(nano_engine INTERFACE include)
 target_include_directories(nano_engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(nano_engine PRIVATE CONAN_PKG::spdlog)

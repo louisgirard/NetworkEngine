@@ -14,6 +14,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(NANO_ENGINE_BUILD_TESTS "Build tests about main library" ON)
 option(NANO_ENGINE_BUILD_EXAMPLES "Build examples about main library" ON)
 
+# Setup conan package manager
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake" "${CMAKE_BINARY_DIR}/conan.cmake")
+endif()
+include("${CMAKE_BINARY_DIR}/conan.cmake")
+
+conan_cmake_run(
+    REQUIRES spdlog/1.8.0
+    BASIC_SETUP CMAKE_TARGETS
+    BUILD missing
+)
+
 # Add extern folder for external libraries
 add_subdirectory(extern)
 
