@@ -5,6 +5,7 @@
 namespace nano_engine::engine
 {
 	class EngineImpl;
+	class World;
 	class Engine
 	{
 	public:
@@ -22,6 +23,7 @@ namespace nano_engine::engine
 		void Startup();
 		void Run();
 		void Stop();
+		std::weak_ptr<World> GetWorld();
 
 	private:
 		Engine();
