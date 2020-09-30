@@ -25,3 +25,4 @@ target_include_directories(nano_engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inclu
 
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::entt)
+target_link_libraries(nano_engine PRIVATE CONAN_PKG::bullet3)
