@@ -7,7 +7,7 @@ namespace nano_engine::systems
 	class FPSCounterImpl
 	{
 	public:
-		void Update(std::chrono::milliseconds deltaTime)
+		void Update(std::chrono::milliseconds deltaTime, engine::World& world)
 		{
 			m_frames++;
 			m_totalMilli += deltaTime;
@@ -35,8 +35,8 @@ namespace nano_engine::systems
 		m_impl = nullptr;
 	}
 
-	void FPSCounter::Update(std::chrono::milliseconds deltaTime)
+	void FPSCounter::Update(std::chrono::milliseconds deltaTime, engine::World& world)
 	{
-		m_impl->Update(deltaTime);
+		m_impl->Update(deltaTime, world);
 	}
 }

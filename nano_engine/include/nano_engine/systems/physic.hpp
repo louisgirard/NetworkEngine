@@ -5,19 +5,19 @@
 
 namespace nano_engine::systems
 {
-	class FPSCounterImpl;
-	class FPSCounter : public ISystem
+	class PhysicsImpl;
+	class Physics : public ISystem
 	{
 	public:
-		FPSCounter();
-		virtual ~FPSCounter();
+		Physics();
+		virtual ~Physics();
 
-		FPSCounter(const FPSCounter& other) = delete;
-		FPSCounter(FPSCounter&& other) = delete;
+		Physics(const Physics& other) = delete;
+		Physics(Physics&& other) = delete;
 
 		void Update(std::chrono::milliseconds deltaTime, engine::World& world) override;
 
 	private:
-		std::unique_ptr<FPSCounterImpl> m_impl;
+		std::unique_ptr<PhysicsImpl> m_impl;
 	};
 }
