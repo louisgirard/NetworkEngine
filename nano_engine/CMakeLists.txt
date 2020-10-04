@@ -10,7 +10,8 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/components/velocity.hpp
     include/nano_engine/systems/physic.hpp
     include/nano_engine/components/name.hpp
-    include/nano_engine/systems/entity_viewer.hpp)
+    include/nano_engine/systems/entity_viewer.hpp
+    include/nano_engine/components/rigid_body.hpp)
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp

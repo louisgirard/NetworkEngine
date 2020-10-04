@@ -13,6 +13,9 @@
 
 #include <nano_engine/components/position.hpp>
 #include <nano_engine/components/velocity.hpp>
+#include <nano_engine/components/rigid_body.hpp>
+
+#include <btBulletDynamicsCommon.h>
 
 namespace nano_engine::engine
 {
@@ -22,12 +25,18 @@ namespace nano_engine::engine
 		EngineImpl() : m_world(std::make_shared<World>("nano-engine"))
 		{
 			auto cube = m_world->CreateEntity("cube");
-			m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
+			auto cubePos = m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
 			m_world->AddComponent<components::Velocity>(cube, 0.f, 0.f, 0.f);
 
+			btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+			m_world->AddComponent<components::RigidBody>(cube, groundShape, 0.f, cubePos);
+
 			auto sphere = m_world->CreateEntity("sphere");
-			m_world->AddComponent<components::Position>(sphere, 0.f, 0.f, 0.f);
+			auto spherePos = m_world->AddComponent<components::Position>(sphere, 0.f, 1000.f, 0.f);
 			m_world->AddComponent<components::Velocity>(sphere, 0.f, 10.f, 0.f);
+
+			btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+			m_world->AddComponent<components::RigidBody>(sphere, colShape, 1.f, spherePos);
 		}
 
 		~EngineImpl()
@@ -44,7 +53,7 @@ namespace nano_engine::engine
 		{
 			spdlog::set_level(spdlog::level::debug);
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
-			m_systems.emplace_back(std::make_unique<systems::Physics>());
+			m_systems.emplace_back(std::make_unique<systems::Physics>(0.f, -9.8f, 0.f));
 			m_systems.emplace_back(std::make_unique<systems::EntityViewer>());
 		}
 
