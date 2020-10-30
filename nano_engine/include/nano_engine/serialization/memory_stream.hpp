@@ -15,10 +15,46 @@ namespace nano_engine::serialization
 			m_buffer = static_cast<char*>(std::malloc(m_capacity));
 		}
 
-		MemoryStream(size_t initialCapacity)
+		explicit MemoryStream(size_t initialCapacity)
 		{
 			m_buffer = static_cast<char*>(std::malloc(initialCapacity));
 			m_capacity = initialCapacity;
+		}
+
+		MemoryStream(const char* buffer, size_t size)
+		{
+			m_buffer = static_cast<char*>(std::malloc(size));
+			std::memcpy(m_buffer, buffer, size);
+			m_capacity = size;
+		}
+
+		MemoryStream(char* buffer, size_t size)
+		{
+			m_buffer = buffer;
+			buffer = nullptr;
+			m_capacity = size;
+		}
+
+		MemoryStream(const MemoryStream& stream)
+		{
+			m_buffer = static_cast<char*>(std::malloc(stream.m_capacity));
+			std::memcpy(m_buffer, stream.m_buffer, stream.m_capacity);
+			m_capacity = stream.m_capacity;
+			m_size = stream.m_size;
+			m_head = stream.m_head;
+		}
+
+		MemoryStream(MemoryStream&& stream)
+		{
+			m_buffer = stream.m_buffer;
+			m_capacity = stream.m_capacity;
+			m_size = stream.m_size;
+			m_head = stream.m_head;
+
+			stream.m_buffer = nullptr;
+			stream.m_capacity = 0;
+			stream.m_size = 0;
+			stream.m_head = 0;
 		}
 
 		~MemoryStream()
@@ -27,6 +63,7 @@ namespace nano_engine::serialization
 		}
 
 		size_t Size() const { return m_size; }
+		void Size(size_t size) { m_size = size; }
 		const char* Data() const { return m_buffer; }
 
 		template<typename T>
