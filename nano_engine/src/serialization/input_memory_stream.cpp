@@ -1,0 +1,1 @@
+#include <nano_engine/serialization/input_memory_stream.hpp>
