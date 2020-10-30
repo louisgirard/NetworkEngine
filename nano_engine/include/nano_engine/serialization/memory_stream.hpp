@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <memory>
 
 #include <nano_engine/serialization/endianness.hpp>
@@ -11,8 +12,7 @@ namespace nano_engine::serialization
 	public:
 		MemoryStream()
 		{
-			m_buffer = static_cast<char*>(std::malloc(32));
-			m_capacity = 32;
+			m_buffer = static_cast<char*>(std::malloc(m_capacity));
 		}
 
 		MemoryStream(size_t initialCapacity)
@@ -58,6 +58,29 @@ namespace nano_engine::serialization
 			m_size += dataSize;
 		}
 
+		template<typename T>
+		T Read()
+		{
+			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>, "Generic read only supports primitive data types");
+
+			T value;
+			Read(reinterpret_cast<char*>(&value), sizeof(value));
+
+			if (DetectEndianness() == PlatformEndianness::BigEndian)
+			{
+				value = SwapEndian(value);
+			}
+
+			return value;
+		}
+
+		void Read(char* data, size_t size)
+		{
+			assert(size + m_head <= m_size);
+			std::memcpy(data, m_buffer, size);
+			m_head += size;
+		}
+
 	private:
 		void Resize(size_t capacity)
 		{
@@ -66,7 +89,9 @@ namespace nano_engine::serialization
 		}
 
 		char* m_buffer;
-		size_t m_capacity;
-		size_t m_size;
+		size_t m_capacity = 32;
+		size_t m_size = 0;
+
+		size_t m_head = 0;
 	};
 }
