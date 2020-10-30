@@ -19,7 +19,8 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/serialization/memory_stream.hpp
     include/nano_engine/serialization/endianness.hpp
     include/nano_engine/serialization/input_memory_stream.hpp
-    include/nano_engine/serialization/output_memory_stream.hpp)
+    include/nano_engine/serialization/output_memory_stream.hpp
+    include/nano_engine/components/rotation.hpp "include/nano_engine/systems/entity_serializer.hpp")
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp
@@ -29,7 +30,7 @@ set(NANO_ENGINE_SOURCES
     src/systems/entity_viewer.cpp
     src/serialization/memory_stream.cpp
     src/serialization/input_memory_stream.cpp
-    src/serialization/output_memory_stream.cpp)
+    src/serialization/output_memory_stream.cpp "src/systems/entity_serializer.cpp")
 
 add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 target_include_directories(nano_engine INTERFACE include)

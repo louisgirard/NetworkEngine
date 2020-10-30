@@ -114,7 +114,7 @@ namespace nano_engine::serialization
 		void Read(char* data, size_t size)
 		{
 			assert(size + m_head <= m_size);
-			std::memcpy(data, m_buffer, size);
+			std::memcpy(data, m_buffer + m_head, size);
 			m_head += size;
 		}
 
