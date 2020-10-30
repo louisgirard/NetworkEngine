@@ -16,7 +16,8 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/components/colliders/box_collider.hpp
     include/nano_engine/components/colliders/capsule_collider.hpp
     include/nano_engine/components/colliders/sphere_collider.hpp
-    include/nano_engine/serialization/memory_stream.hpp)
+    include/nano_engine/serialization/memory_stream.hpp
+    include/nano_engine/serialization/endianness.hpp)
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp

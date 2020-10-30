@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <nano_engine/serialization/endianness.hpp>
+
 namespace nano_engine::serialization
 {
 	class MemoryStream
@@ -32,7 +34,17 @@ namespace nano_engine::serialization
 		{
 			// Check during compilation, if T is a number or enum
 			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>, "Generic write only supports primitive data types");
-			Write(reinterpret_cast<char*>(&data), sizeof(data));
+			
+			if (DetectEndianness() == PlatformEndianness::BigEndian)
+			{
+				//Convert to little endian
+				auto dateLittleEndian = SwapEndian(data);
+				Write(reinterpret_cast<char*>(&dateLittleEndian), sizeof(dateLittleEndian));
+			}
+			else
+			{
+				Write(reinterpret_cast<char*>(&data), sizeof(data));
+			}
 		}
 
 		void Write(const char* data, size_t dataSize)
