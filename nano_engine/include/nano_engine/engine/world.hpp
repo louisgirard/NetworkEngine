@@ -33,7 +33,7 @@ namespace nano_engine::engine
 		}
 		
 		template<typename Component_t, typename ...Args>
-		Component_t AddComponent(entt::entity entity, Args... args)
+		Component_t& AddComponent(entt::entity entity, Args... args)
 		{
 			return m_registry.emplace<Component_t>(entity, std::forward<Args>(args)...);
 		}

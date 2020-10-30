@@ -10,7 +10,8 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/components/velocity.hpp
     include/nano_engine/systems/physic.hpp
     include/nano_engine/components/name.hpp
-    include/nano_engine/systems/entity_viewer.hpp)
+    include/nano_engine/systems/entity_viewer.hpp
+    include/nano_engine/components/rigid_body.hpp)
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp
@@ -25,3 +26,4 @@ target_include_directories(nano_engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inclu
 
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::entt)
+target_link_libraries(nano_engine PRIVATE CONAN_PKG::bullet3)

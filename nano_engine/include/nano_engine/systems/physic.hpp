@@ -9,7 +9,7 @@ namespace nano_engine::systems
 	class Physics : public ISystem
 	{
 	public:
-		Physics();
+		Physics(float gravityX, float gravityY, float gravityZ);
 		virtual ~Physics();
 
 		Physics(const Physics& other) = delete;
