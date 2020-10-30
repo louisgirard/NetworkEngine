@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nano_engine/components/colliders/collider.hpp>
 #include <nano_engine/components/position.hpp>
 
 #include <btBulletDynamicsCommon.h>
@@ -25,13 +26,13 @@ namespace nano_engine::components
 	class RigidBody
 	{
 	public:
-		RigidBody(btCollisionShape* collisionShape, float mass, const Position& pos) : m_localInertia(0, 0, 0)
+		RigidBody(const Collider& collider, float mass, const Position& pos) : m_localInertia(0, 0, 0)
 		{
 			//Create the state holder
 			m_stateHolder = std::make_shared<RigidBodyHolder>();
 
 			//Save values
-			m_stateHolder->m_collisionShape = collisionShape;
+			m_stateHolder->m_collisionShape = collider.CollisionShape();
 			m_mass = mass;
 
 			//Create the bullet mass
@@ -43,7 +44,7 @@ namespace nano_engine::components
 			//Compute inertia
 			if (m_isDynamic)
 			{
-				collisionShape->calculateLocalInertia(btMass, m_localInertia);
+				m_stateHolder->m_collisionShape->calculateLocalInertia(btMass, m_localInertia);
 			}
 
 			//Create the transform

@@ -15,6 +15,9 @@
 #include <nano_engine/components/velocity.hpp>
 #include <nano_engine/components/rigid_body.hpp>
 
+#include <nano_engine/components/colliders/box_collider.hpp>
+#include <nano_engine/components/colliders/sphere_collider.hpp>
+
 #include <btBulletDynamicsCommon.h>
 
 namespace nano_engine::engine
@@ -28,15 +31,15 @@ namespace nano_engine::engine
 			auto cubePos = m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
 			m_world->AddComponent<components::Velocity>(cube, 0.f, 0.f, 0.f);
 
-			btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-			m_world->AddComponent<components::RigidBody>(cube, groundShape, 0.f, cubePos);
+			auto boxCollider = m_world->AddComponent<components::BoxCollider>(cube, 100.f, 100.f, 100.f);
+			m_world->AddComponent<components::RigidBody>(cube, boxCollider, 0.f, cubePos);
 
 			auto sphere = m_world->CreateEntity("sphere");
 			auto spherePos = m_world->AddComponent<components::Position>(sphere, 0.f, 1000.f, 0.f);
 			m_world->AddComponent<components::Velocity>(sphere, 0.f, 10.f, 0.f);
 
-			btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-			m_world->AddComponent<components::RigidBody>(sphere, colShape, 1.f, spherePos);
+			auto sphereCollider = m_world->AddComponent<components::SphereCollider>(sphere, 1);
+			m_world->AddComponent<components::RigidBody>(sphere, sphereCollider, 1.f, spherePos);
 		}
 
 		~EngineImpl()

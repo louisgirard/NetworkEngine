@@ -11,7 +11,11 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/systems/physic.hpp
     include/nano_engine/components/name.hpp
     include/nano_engine/systems/entity_viewer.hpp
-    include/nano_engine/components/rigid_body.hpp)
+    include/nano_engine/components/rigid_body.hpp
+    include/nano_engine/components/colliders/collider.hpp
+    include/nano_engine/components/colliders/box_collider.hpp
+    include/nano_engine/components/colliders/capsule_collider.hpp
+    include/nano_engine/components/colliders/sphere_collider.hpp)
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp
