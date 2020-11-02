@@ -49,8 +49,7 @@ namespace nano_engine::systems
 
 		void EndFrame()
 		{
-			//serialization::InputMemoryStream stream(m_stream.Data(), m_stream.Size());
-			serialization::InputMemoryStream stream(std::move(m_stream));
+			serialization::InputMemoryStream stream(m_stream.Data(), m_stream.Size());
 
 			auto worldView = m_world->Registry().view<components::Position,
 				components::Rotation,
