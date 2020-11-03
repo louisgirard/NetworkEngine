@@ -7,5 +7,19 @@ namespace nano_engine::components
 		float x;
 		float y;
 		float z;
+
+		void Write(serialization::OutputMemoryStream& stream)
+		{
+			stream.Write(x);
+			stream.Write(y);
+			stream.Write(z);
+		}
+
+		void Read(serialization::InputMemoryStream& stream)
+		{
+			x = stream.Read<float>();
+			y = stream.Read<float>();
+			z = stream.Read<float>();
+		}
 	};
 }

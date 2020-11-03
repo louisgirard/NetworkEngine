@@ -10,12 +10,11 @@ namespace nano_engine::serialization
 	public:
 		InputMemoryStream(OutputMemoryStream&& stream) : m_stream(std::move(stream.RawStream()))
 		{
-			m_stream.Size(stream.Size());
 		}
 
-		InputMemoryStream(char* data, size_t size) : m_stream(data, size)
+		InputMemoryStream(const char* data, size_t size) : m_stream(data, size)
 		{
-
+			m_stream.Size(size);
 		}
 
 		size_t Size() const { return m_stream.Size(); }

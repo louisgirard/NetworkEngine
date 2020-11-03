@@ -9,6 +9,8 @@ namespace nano_engine::systems
 	class ISystem
 	{
 	public:
-		virtual void Update(std::chrono::milliseconds deltaTime, engine::World& world) = 0;
+		virtual void BeginFrame() {};
+		virtual void Update(std::chrono::milliseconds deltaTime, engine::World& world) {};
+		virtual void EndFrame() {};
 	};
 }

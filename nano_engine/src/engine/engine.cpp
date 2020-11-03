@@ -7,13 +7,15 @@
 #include <nano_engine/systems/fps_counter.hpp>
 #include <nano_engine/systems/physic.hpp>
 #include <nano_engine/systems/entity_viewer.hpp>
+#include <nano_engine/systems/entity_serializer.hpp>
 
 #include <nano_engine/engine/engine.hpp>
 #include <nano_engine/engine/world.hpp>
 
 #include <nano_engine/components/position.hpp>
-#include <nano_engine/components/velocity.hpp>
+#include <nano_engine/components/rotation.hpp>
 #include <nano_engine/components/rigid_body.hpp>
+#include <nano_engine/components/velocity.hpp>
 
 #include <nano_engine/components/colliders/box_collider.hpp>
 #include <nano_engine/components/colliders/sphere_collider.hpp>
@@ -30,6 +32,7 @@ namespace nano_engine::engine
 			auto cube = m_world->CreateEntity("cube");
 			auto cubePos = m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
 			m_world->AddComponent<components::Velocity>(cube, 0.f, 0.f, 0.f);
+			m_world->AddComponent<components::Rotation>(cube, 0.f, 0.f, 0.f, 0.f);
 
 			auto boxCollider = m_world->AddComponent<components::BoxCollider>(cube, 100.f, 100.f, 100.f);
 			m_world->AddComponent<components::RigidBody>(cube, boxCollider, 0.f, cubePos);
@@ -37,6 +40,7 @@ namespace nano_engine::engine
 			auto sphere = m_world->CreateEntity("sphere");
 			auto spherePos = m_world->AddComponent<components::Position>(sphere, 0.f, 1000.f, 0.f);
 			m_world->AddComponent<components::Velocity>(sphere, 0.f, 10.f, 0.f);
+			m_world->AddComponent<components::Rotation>(sphere, 0.f, 0.f, 0.f, 0.f);
 
 			auto sphereCollider = m_world->AddComponent<components::SphereCollider>(sphere, 1);
 			m_world->AddComponent<components::RigidBody>(sphere, sphereCollider, 1.f, spherePos);
@@ -58,6 +62,7 @@ namespace nano_engine::engine
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
 			m_systems.emplace_back(std::make_unique<systems::Physics>(0.f, -9.8f, 0.f));
 			m_systems.emplace_back(std::make_unique<systems::EntityViewer>());
+			m_systems.emplace_back(std::make_unique<systems::EntitySerializer>());
 		}
 
 		void Run()
@@ -69,6 +74,11 @@ namespace nano_engine::engine
 			std::chrono::milliseconds deltaTime(0);
 			while (!m_stop)
 			{
+				for (auto& system : m_systems)
+				{
+					system->BeginFrame();
+				}
+
 				auto start = std::chrono::high_resolution_clock::now();
 				
 				for (auto& system : m_systems)
@@ -77,6 +87,11 @@ namespace nano_engine::engine
 				}
 
 				std::this_thread::sleep_for(1ms);
+
+				for (auto& system : m_systems)
+				{
+					system->EndFrame();
+				}
 
 				auto end = std::chrono::high_resolution_clock::now();
 				deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
