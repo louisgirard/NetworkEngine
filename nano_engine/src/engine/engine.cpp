@@ -11,14 +11,7 @@
 
 #include <nano_engine/engine/engine.hpp>
 #include <nano_engine/engine/world.hpp>
-
-#include <nano_engine/components/position.hpp>
-#include <nano_engine/components/rotation.hpp>
-#include <nano_engine/components/rigid_body.hpp>
-#include <nano_engine/components/velocity.hpp>
-
-#include <nano_engine/components/colliders/box_collider.hpp>
-#include <nano_engine/components/colliders/sphere_collider.hpp>
+#include <nano_engine/engine/entity.hpp>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -28,23 +21,7 @@ namespace nano_engine::engine
 	{
 	public:
 		EngineImpl() : m_world(std::make_shared<World>("nano-engine"))
-		{
-			auto cube = m_world->CreateEntity("cube");
-			auto cubePos = m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
-			m_world->AddComponent<components::Velocity>(cube, 0.f, 0.f, 0.f);
-			m_world->AddComponent<components::Rotation>(cube, 0.f, 0.f, 0.f, 0.f);
-
-			auto boxCollider = m_world->AddComponent<components::BoxCollider>(cube, 100.f, 100.f, 100.f);
-			m_world->AddComponent<components::RigidBody>(cube, boxCollider, 0.f, cubePos);
-
-			auto sphere = m_world->CreateEntity("sphere");
-			auto spherePos = m_world->AddComponent<components::Position>(sphere, 0.f, 1000.f, 0.f);
-			m_world->AddComponent<components::Velocity>(sphere, 0.f, 10.f, 0.f);
-			m_world->AddComponent<components::Rotation>(sphere, 0.f, 0.f, 0.f, 0.f);
-
-			auto sphereCollider = m_world->AddComponent<components::SphereCollider>(sphere, 1);
-			m_world->AddComponent<components::RigidBody>(sphere, sphereCollider, 1.f, spherePos);
-		}
+		{}
 
 		~EngineImpl()
 		{

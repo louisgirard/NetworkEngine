@@ -20,7 +20,10 @@ set(NANO_ENGINE_HEADERS
     include/nano_engine/serialization/endianness.hpp
     include/nano_engine/serialization/input_memory_stream.hpp
     include/nano_engine/serialization/output_memory_stream.hpp
-    include/nano_engine/components/rotation.hpp "include/nano_engine/systems/entity_serializer.hpp")
+    include/nano_engine/components/rotation.hpp
+    include/nano_engine/systems/entity_serializer.hpp
+    include/nano_engine/engine/entity.hpp
+    include/nano_engine/components/scale.hpp)
 
 set(NANO_ENGINE_SOURCES
     src/engine/engine.cpp
@@ -30,12 +33,14 @@ set(NANO_ENGINE_SOURCES
     src/systems/entity_viewer.cpp
     src/serialization/memory_stream.cpp
     src/serialization/input_memory_stream.cpp
-    src/serialization/output_memory_stream.cpp "src/systems/entity_serializer.cpp")
+    src/serialization/output_memory_stream.cpp
+    src/systems/entity_serializer.cpp
+    src/engine/entity.cpp)
 
 add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 target_include_directories(nano_engine INTERFACE include)
 target_include_directories(nano_engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::spdlog)
-target_link_libraries(nano_engine PRIVATE CONAN_PKG::entt)
+target_link_libraries(nano_engine PUBLIC CONAN_PKG::entt)
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::bullet3)
