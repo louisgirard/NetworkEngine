@@ -7,16 +7,33 @@ namespace nano_engine::engine
 	Entity::Entity(World& world, const std::string& name) : m_world(world)
 	{
 		m_objectID = ms_lastObjectID++;
-		m_entityID = m_world.CreateEntity();
+		m_entityID = world.CreateEntity();
 
 		m_name = AddComponent<components::Name>(name);
-		m_pos = AddComponent<components::Position>(0.f, 0.f, 0.f);
-		m_rot = AddComponent<components::Rotation>(0.f, 0.f, 0.f, 0.f);
-		m_scale = AddComponent<components::Scale>(1.f, 1.f, 1.f);
+
+		m_state = std::make_shared<EntityState>(
+			AddComponent<components::Position>(0.f, 0.f, 0.f),
+			AddComponent<components::Rotation>(0.f, 0.f, 0.f, 0.f),
+			AddComponent<components::Scale>(1.f, 1.f, 1.f)
+			);
 	}
 
 	Entity::~Entity()
 	{
 
+	}
+
+	void Entity::Write(serialization::OutputMemoryStream& stream)
+	{
+		m_state->m_pos.Write(stream);
+		m_state->m_rot.Write(stream);
+		m_state->m_scale.Write(stream);
+	}
+
+	void Entity::Read(serialization::InputMemoryStream& stream)
+	{
+		m_state->m_pos.Read(stream);
+		m_state->m_rot.Read(stream);
+		m_state->m_scale.Read(stream);
 	}
 }

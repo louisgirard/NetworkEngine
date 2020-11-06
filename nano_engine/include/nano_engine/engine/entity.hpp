@@ -19,20 +19,29 @@
 
 namespace nano_engine::engine
 {
+	struct EntityState
+	{
+		components::Position& m_pos;
+		components::Rotation& m_rot;
+		components::Scale& m_scale;
+
+		EntityState(components::Position& pos, components::Rotation& rot, components::Scale& scale)
+			: m_pos(pos), m_rot(rot), m_scale(scale)
+		{
+
+		}
+	};
+
 	class Entity
 	{
 	public:
 		Entity(World& world, const std::string& name);
+		Entity(const Entity& other) = default;
 		~Entity();
 		
-		virtual void Write(serialization::OutputMemoryStream& stream)
-		{
+		virtual void Write(serialization::OutputMemoryStream& stream);
 
-		}
-		virtual void Read(serialization::InputMemoryStream& stream)
-		{
-			
-		}
+		virtual void Read(serialization::InputMemoryStream& stream);
 
 		uint64_t ObjectID() const { return m_objectID; }
 
@@ -45,16 +54,15 @@ namespace nano_engine::engine
 		components::Name& Name() { return m_name; }
 		components::Name Name() const { return m_name; }
 
-		components::Position& Position() { return m_pos; }
-		components::Position Position() const { return m_pos; }
+		components::Position& Position() { return m_state->m_pos; }
+		components::Position Position() const { return m_state->m_pos; }
 
-		components::Rotation& Rotation() { return m_rot; }
-		components::Rotation Rotation() const { return m_rot; }
+		components::Rotation& Rotation() { return m_state->m_rot; }
+		components::Rotation Rotation() const { return m_state->m_rot; }
 
-		components::Scale& Scale() { return m_scale; }
-		components::Scale Scale() const { return m_scale; }
+		components::Scale& Scale() { return m_state->m_scale; }
+		components::Scale Scale() const { return m_state->m_scale; }
 		
-
 	private:
 		World& m_world;
 		uint32_t m_entityID;
@@ -63,8 +71,7 @@ namespace nano_engine::engine
 		uint64_t m_objectID;
 
 		components::Name m_name;
-		components::Position m_pos;
-		components::Rotation m_rot;
-		components::Scale m_scale;
+
+		std::shared_ptr<EntityState> m_state;
 	}; 
 }

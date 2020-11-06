@@ -49,7 +49,7 @@ namespace nano_engine::systems
 
 		void EndFrame()
 		{
-			serialization::InputMemoryStream stream(m_stream.Data(), m_stream.Size());
+			/*serialization::InputMemoryStream stream(m_stream.Data(), m_stream.Size());
 
 			auto worldView = m_world->Registry().view<components::Position,
 				components::Rotation,
@@ -61,7 +61,7 @@ namespace nano_engine::systems
 				worldView.get<components::Position>(entityID).Read(stream);
 				worldView.get<components::Rotation>(entityID).Read(stream);
 				worldView.get<components::Velocity>(entityID).Read(stream);
-			}
+			}*/
 		}
 
 	private:
