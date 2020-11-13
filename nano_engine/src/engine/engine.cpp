@@ -4,21 +4,24 @@
 #include <spdlog/spdlog.h>
 
 #include <nano_engine/systems/system.hpp>
+
 #include <nano_engine/systems/fps_counter.hpp>
-#include <nano_engine/systems/physic.hpp>
 #include <nano_engine/systems/entity_viewer.hpp>
 #include <nano_engine/systems/entity_serializer.hpp>
+#include <nano_engine/systems/physic.hpp>
 
 #include <nano_engine/engine/engine.hpp>
 #include <nano_engine/engine/world.hpp>
+#include <nano_engine/engine/entity.hpp>
 
 #include <nano_engine/components/position.hpp>
-#include <nano_engine/components/rotation.hpp>
-#include <nano_engine/components/rigid_body.hpp>
 #include <nano_engine/components/velocity.hpp>
+#include <nano_engine/components/rotation.hpp>
+#include <nano_engine/components/scale.hpp>
+#include <nano_engine/components/rigid_body.hpp>
 
-#include <nano_engine/components/colliders/box_collider.hpp>
 #include <nano_engine/components/colliders/sphere_collider.hpp>
+#include <nano_engine/components/colliders/box_collider.hpp>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -27,31 +30,19 @@ namespace nano_engine::engine
 	class EngineImpl
 	{
 	public:
-		EngineImpl() : m_world(std::make_shared<World>("nano-engine"))
+		EngineImpl(uint32_t frameLimit = 0)
 		{
-			auto cube = m_world->CreateEntity("cube");
-			auto cubePos = m_world->AddComponent<components::Position>(cube, 0.f, 0.f, 0.f);
-			m_world->AddComponent<components::Velocity>(cube, 0.f, 0.f, 0.f);
-			m_world->AddComponent<components::Rotation>(cube, 0.f, 0.f, 0.f, 0.f);
+			m_world = std::make_shared<World>("nano_engine");
 
-			auto boxCollider = m_world->AddComponent<components::BoxCollider>(cube, 100.f, 100.f, 100.f);
-			m_world->AddComponent<components::RigidBody>(cube, boxCollider, 0.f, cubePos);
-
-			auto sphere = m_world->CreateEntity("sphere");
-			auto spherePos = m_world->AddComponent<components::Position>(sphere, 0.f, 1000.f, 0.f);
-			m_world->AddComponent<components::Velocity>(sphere, 0.f, 10.f, 0.f);
-			m_world->AddComponent<components::Rotation>(sphere, 0.f, 0.f, 0.f, 0.f);
-
-			auto sphereCollider = m_world->AddComponent<components::SphereCollider>(sphere, 1);
-			m_world->AddComponent<components::RigidBody>(sphere, sphereCollider, 1.f, spherePos);
+			FrameLimiter(frameLimit);
 		}
 
 		~EngineImpl()
 		{
-			Stop(); 
+			Stop();
 		}
 
-		void ParseCommandLine(int argc, char* argv[])
+		void ParseCommandeLine(int argc, char* argv[])
 		{
 
 		}
@@ -59,8 +50,9 @@ namespace nano_engine::engine
 		void Startup()
 		{
 			spdlog::set_level(spdlog::level::debug);
+
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
-			m_systems.emplace_back(std::make_unique<systems::Physics>(0.f, -9.8f, 0.f));
+			m_systems.emplace_back(std::make_unique<systems::Physics>(0, -9.8f, 0));
 			m_systems.emplace_back(std::make_unique<systems::EntityViewer>());
 			m_systems.emplace_back(std::make_unique<systems::EntitySerializer>());
 		}
@@ -71,31 +63,51 @@ namespace nano_engine::engine
 
 			m_stop = false;
 
-			std::chrono::milliseconds deltaTime(0);
+			std::chrono::microseconds deltaTime(0);
 			while (!m_stop)
 			{
+				// BeginFrame on all the systems
 				for (auto& system : m_systems)
 				{
 					system->BeginFrame();
 				}
 
 				auto start = std::chrono::high_resolution_clock::now();
-				
+
+				// Update all the systems
 				for (auto& system : m_systems)
 				{
 					system->Update(deltaTime, *m_world);
 				}
-
-				std::this_thread::sleep_for(1ms);
-
+				
+				// EndFrame on all the systems
 				for (auto& system : m_systems)
 				{
 					system->EndFrame();
 				}
 
 				auto end = std::chrono::high_resolution_clock::now();
-				deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+				deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+				if (m_fixedFrameRate != 0)
+				{
+					while (deltaTime < m_frameDuration)
+					{
+						std::this_thread::yield();
+						end = std::chrono::high_resolution_clock::now();
+						deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+					}
+				}
 			}
+		}
+
+		void FrameLimiter(uint32_t frameRate)
+		{
+			m_fixedFrameRate = 0;
+			if (frameRate == 0) return;
+
+			m_fixedFrameRate = frameRate;
+			m_frameDuration = 1'000'000us / m_fixedFrameRate;
 		}
 
 		void Stop()
@@ -114,11 +126,15 @@ namespace nano_engine::engine
 		std::vector<std::unique_ptr<systems::ISystem>> m_systems;
 
 		std::shared_ptr<World> m_world;
+
+		uint32_t m_fixedFrameRate = 0;
+
+		std::chrono::microseconds m_frameDuration = 0us;
 	};
 
-	Engine::Engine() : m_impl(std::make_unique<EngineImpl>())
+	Engine::Engine()
 	{
-
+		m_impl = std::make_unique<EngineImpl>();
 	}
 
 	Engine::~Engine()
@@ -126,9 +142,9 @@ namespace nano_engine::engine
 		m_impl = nullptr;
 	}
 
-	void Engine::ParseCommandLine(int argc, char* argv[])
+	void Engine::ParseCommandeLine(int argc, char* argv[])
 	{
-		m_impl->ParseCommandLine(argc, argv);
+		m_impl->ParseCommandeLine(argc, argv);
 	}
 
 	void Engine::Startup()
@@ -144,6 +160,11 @@ namespace nano_engine::engine
 	void Engine::Stop()
 	{
 		m_impl->Stop();
+	}
+
+	void Engine::FrameLimiter(uint32_t frameRate)
+	{
+		m_impl->FrameLimiter(frameRate);
 	}
 
 	std::weak_ptr<World> Engine::GetWorld()

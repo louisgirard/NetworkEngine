@@ -1,6 +1,8 @@
+#include <btBulletDynamicsCommon.h>
+
 #include <nano_engine/systems/physic.hpp>
 
-#include <btBulletDynamicsCommon.h>
+#include <entt/entt.hpp>
 
 #include <nano_engine/components/position.hpp>
 #include <nano_engine/components/rigid_body.hpp>
@@ -21,7 +23,7 @@ namespace nano_engine::systems
 			m_dynamicsWorld->setGravity(btVector3(gravityX, gravityY, gravityZ));
 		}
 
-		~PhysicsImpl()
+		virtual ~PhysicsImpl()
 		{
 
 		}
@@ -29,22 +31,26 @@ namespace nano_engine::systems
 		PhysicsImpl(const PhysicsImpl& other) = delete;
 		PhysicsImpl(PhysicsImpl&& other) = delete;
 
-		void Update(std::chrono::milliseconds deltaTime, engine::World& world)
+		void Update(std::chrono::microseconds deltaTime, engine::World& world)
 		{
-			m_totalMilli += deltaTime;
-			if (m_totalMilli < 1000ms / 60) return;
-
-			// Update physic world
-			m_dynamicsWorld->stepSimulation(m_totalMilli.count() / 1000.f, 10);
-
-			world.Registry().view<components::Position, components::RigidBody>().each([this](auto& pos, auto& body)
+			m_lastStepTime += deltaTime;
+			if (m_lastStepTime < 1'000'000us / 60) return;
+			
+			auto view = world.Registry().view<components::RigidBody>();
+			for (auto entity : view)
+			{
+				auto& body = view.get<components::RigidBody>(entity);
+				if (!body.IsInWorld())
 				{
-					if (!body.IsInWorld())
-					{
-						m_dynamicsWorld->addRigidBody(body.GetRigidBody());
-						body.IsInWorld(true);
-					}
+					m_dynamicsWorld->addRigidBody(body.GetRigidBody());
+					body.IsInWorld(true);
+				}
+			}
 
+			//Update the physic world
+			m_dynamicsWorld->stepSimulation(m_lastStepTime.count()/1'000'000.0f, 10);
+			world.Registry().view<components::Position, components::RigidBody>().each([this](components::Position& pos, components::RigidBody& body)
+				{
 					btTransform trans;
 					if (body.GetRigidBody() && body.GetRigidBody()->getMotionState())
 					{
@@ -54,12 +60,12 @@ namespace nano_engine::systems
 					{
 						trans = body.GetRigidBody()->getWorldTransform();
 					}
-
 					pos.x = trans.getOrigin().getX();
 					pos.y = trans.getOrigin().getY();
 					pos.z = trans.getOrigin().getZ();
 				});
-			m_totalMilli = 0ms;
+
+			m_lastStepTime = 0ms;
 		}
 
 	private:
@@ -69,19 +75,20 @@ namespace nano_engine::systems
 		std::shared_ptr<btSequentialImpulseConstraintSolver> m_solver;
 		std::shared_ptr<btDiscreteDynamicsWorld> m_dynamicsWorld;
 
-		std::chrono::milliseconds m_totalMilli = 0ms;
+		std::chrono::microseconds m_lastStepTime = 0ms;
 	};
 
-	Physics::Physics(float gravityX, float gravityY, float gravityZ) : m_impl(std::make_unique<PhysicsImpl>(gravityX, gravityY, gravityZ))
+	Physics::Physics(float gravityX, float gravityY, float gravityZ)
 	{
+		m_impl = std::make_unique<PhysicsImpl>(gravityX, gravityY, gravityZ);
 	}
 
 	Physics::~Physics()
 	{
 		m_impl = nullptr;
 	}
-
-	void Physics::Update(std::chrono::milliseconds deltaTime, engine::World& world)
+	
+	void Physics::Update(std::chrono::microseconds deltaTime, engine::World& world)
 	{
 		m_impl->Update(deltaTime, world);
 	}

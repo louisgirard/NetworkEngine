@@ -2,8 +2,10 @@
 
 #include <cassert>
 #include <memory>
+#include <type_traits>
+#include <string>
 
-#include <nano_engine/serialization/endianness.hpp>
+#include <nano_engine/serialization/endianess.hpp>
 
 namespace nano_engine::serialization
 {
@@ -41,6 +43,7 @@ namespace nano_engine::serialization
 			std::memcpy(m_buffer, stream.m_buffer, stream.m_capacity);
 			m_capacity = stream.m_capacity;
 			m_size = stream.m_size;
+
 			m_head = stream.m_head;
 		}
 
@@ -52,9 +55,9 @@ namespace nano_engine::serialization
 			m_head = stream.m_head;
 
 			stream.m_buffer = nullptr;
-			stream.m_capacity = 0;
-			stream.m_size = 0;
-			stream.m_head = 0;
+			m_capacity = 0;
+			m_size = 0;
+			m_head = 0;
 		}
 
 		~MemoryStream()
@@ -66,17 +69,22 @@ namespace nano_engine::serialization
 		void Size(size_t size) { m_size = size; }
 		const char* Data() const { return m_buffer; }
 
+		void Reset()
+		{
+			m_size = 0;
+			m_head = 0;
+		}
+
 		template<typename T>
 		void Write(T data)
 		{
-			// Check during compilation, if T is a number or enum
-			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>, "Generic write only supports primitive data types");
-			
-			if (DetectEndianness() == PlatformEndianness::BigEndian)
+			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>
+				, "Generic write only support primitive data types");
+
+			if (DetectEndianess() == PlatformEndianess::BigEndian)
 			{
-				//Convert to little endian
-				auto dateLittleEndian = SwapEndian(data);
-				Write(reinterpret_cast<char*>(&dateLittleEndian), sizeof(dateLittleEndian));
+				auto dataLittleEndian = SwapEndian(data);
+				Write(reinterpret_cast<char*>(&dataLittleEndian), sizeof(data));
 			}
 			else
 			{
@@ -98,12 +106,13 @@ namespace nano_engine::serialization
 		template<typename T>
 		T Read()
 		{
-			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>, "Generic read only supports primitive data types");
+			static_assert(std::is_arithmetic_v<T> || std::is_enum_v<T>
+				, "Generic read only support primitive data types");
 
 			T value;
-			Read(reinterpret_cast<char*>(&value), sizeof(value));
+			Read(reinterpret_cast<char*>(&value), sizeof(T));
 
-			if (DetectEndianness() == PlatformEndianness::BigEndian)
+			if (DetectEndianess() == PlatformEndianess::BigEndian)
 			{
 				value = SwapEndian(value);
 			}

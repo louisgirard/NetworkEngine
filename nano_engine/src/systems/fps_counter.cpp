@@ -1,13 +1,18 @@
 #include <iostream>
+
 #include <spdlog/spdlog.h>
+
 #include <nano_engine/systems/fps_counter.hpp>
+
+#include <nano_engine/engine/engine.hpp>
+#include <nano_engine/engine/world.hpp>
 
 namespace nano_engine::systems
 {
 	class FPSCounterImpl
 	{
 	public:
-		void Update(std::chrono::milliseconds deltaTime, engine::World& world)
+		void Update(std::chrono::microseconds deltaTime, engine::World& world)
 		{
 			m_frames++;
 			m_totalMilli += deltaTime;
@@ -15,7 +20,6 @@ namespace nano_engine::systems
 			if (m_totalMilli >= 1s)
 			{
 				spdlog::debug("FPS : {}", m_frames);
-
 				m_frames = 0;
 				m_totalMilli = 0ms;
 			}
@@ -23,11 +27,13 @@ namespace nano_engine::systems
 
 	private:
 		int m_frames = 0;
-		std::chrono::milliseconds m_totalMilli = 0ms;
+		std::chrono::microseconds m_totalMilli = 0ms;
 	};
 
-	FPSCounter::FPSCounter() : m_impl(std::make_unique<FPSCounterImpl>())
+
+	FPSCounter::FPSCounter()
 	{
+		m_impl = std::make_unique<FPSCounterImpl>();
 	}
 
 	FPSCounter::~FPSCounter()
@@ -35,8 +41,9 @@ namespace nano_engine::systems
 		m_impl = nullptr;
 	}
 
-	void FPSCounter::Update(std::chrono::milliseconds deltaTime, engine::World& world)
+	void FPSCounter::Update(std::chrono::microseconds deltaTime, engine::World& world)
 	{
 		m_impl->Update(deltaTime, world);
 	}
+
 }

@@ -8,7 +8,7 @@ namespace nano_engine::components
 		float y;
 		float z;
 
-		void Write(serialization::OutputMemoryStream& stream)
+		void Write(serialization::OutputMemoryStream& stream) const
 		{
 			stream.Write(x);
 			stream.Write(y);

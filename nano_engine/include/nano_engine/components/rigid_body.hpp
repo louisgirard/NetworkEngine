@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nano_engine/components/colliders/collider.hpp>
 #include <nano_engine/components/position.hpp>
+#include <nano_engine/components/colliders/collider.hpp>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -26,7 +26,7 @@ namespace nano_engine::components
 	class RigidBody
 	{
 	public:
-		RigidBody(const Collider& collider, float mass, const Position& pos) : m_localInertia(0, 0, 0)
+		RigidBody(const Collider& collider, float mass, const Position& pos) : m_localInertia(0,0,0)
 		{
 			//Create the state holder
 			m_stateHolder = std::make_shared<RigidBodyHolder>();

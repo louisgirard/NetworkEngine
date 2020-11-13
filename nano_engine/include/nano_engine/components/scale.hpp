@@ -5,7 +5,7 @@
 
 namespace nano_engine::components
 {
-	struct Position
+	struct Scale
 	{
 		float x;
 		float y;

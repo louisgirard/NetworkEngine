@@ -16,15 +16,18 @@ namespace nano_engine::engine
 		}
 
 		~Engine();
+
 		Engine(const Engine& other) = delete;
 		Engine(Engine&& other) = delete;
 
-		void ParseCommandLine(int argc, char* argv[]);
+		void ParseCommandeLine(int argc, char* argv[]);
 		void Startup();
 		void Run();
 		void Stop();
-		std::weak_ptr<World> GetWorld();
 
+		void FrameLimiter(uint32_t frameRate);
+
+		std::weak_ptr<World> GetWorld();
 	private:
 		Engine();
 

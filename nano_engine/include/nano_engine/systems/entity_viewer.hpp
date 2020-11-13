@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano_engine/common.hpp>
+
 #include <nano_engine/systems/system.hpp>
 
 namespace nano_engine::systems
@@ -15,7 +16,7 @@ namespace nano_engine::systems
 		EntityViewer(const EntityViewer& other) = delete;
 		EntityViewer(EntityViewer&& other) = delete;
 
-		void Update(std::chrono::milliseconds deltaTime, engine::World& world) override;
+		virtual void Update(std::chrono::microseconds deltaTime, engine::World& world) override;
 
 	private:
 		std::unique_ptr<EntityViewerImpl> m_impl;
