@@ -10,7 +10,7 @@ namespace nano_engine::systems
 	{
 	public:
 		virtual void BeginFrame() {};
-		virtual void Update(std::chrono::milliseconds deltaTime, engine::World& world) {};
+		virtual void Update(std::chrono::microseconds deltaTime, engine::World& world) {};
 		virtual void EndFrame() {};
 	};
 }

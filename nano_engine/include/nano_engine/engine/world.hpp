@@ -4,8 +4,13 @@
 
 #include <entt/entt.hpp>
 
+#include <nano_engine/components/name.hpp>
+
 namespace nano_engine::engine
 {
+	using EntityID_t = uint32_t;
+	using EntityRegistry = entt::registry;
+
 	class Entity;
 	class WorldImpl;
 	class World
@@ -17,11 +22,12 @@ namespace nano_engine::engine
 		World(const World& other) = delete;
 		World(World&& other) = delete;
 
-		entt::registry& Registry();
-
-		uint32_t CreateEntity();
+		EntityRegistry& Registry();
+		
+		EntityID_t CreateEntity();
+		void DestroyEntity(EntityID_t id);
 
 	private:
-		std::unique_ptr<WorldImpl> m_impl;
+		WorldImpl* m_impl;
 	};
 }

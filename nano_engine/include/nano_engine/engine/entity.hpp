@@ -1,16 +1,8 @@
 #pragma once
 
 #include <type_traits>
-#include <cstdint>
-
-#include <entt/entt.hpp>
 
 #include <nano_engine/common.hpp>
-
-#include <nano_engine/components/name.hpp>
-#include <nano_engine/components/position.hpp>
-#include <nano_engine/components/rotation.hpp>
-#include <nano_engine/components/scale.hpp>
 
 #include <nano_engine/engine/world.hpp>
 
@@ -19,59 +11,40 @@
 
 namespace nano_engine::engine
 {
-	struct EntityState
-	{
-		components::Position& m_pos;
-		components::Rotation& m_rot;
-		components::Scale& m_scale;
-
-		EntityState(components::Position& pos, components::Rotation& rot, components::Scale& scale)
-			: m_pos(pos), m_rot(rot), m_scale(scale)
-		{
-
-		}
-	};
-
+	using ObjectID_t = uint64_t;
 	class Entity
 	{
 	public:
-		Entity(World& world, const std::string& name);
-		Entity(const Entity& other) = default;
-		~Entity();
-		
-		virtual void Write(serialization::OutputMemoryStream& stream);
+		Entity(std::weak_ptr<World> world, const std::string& name);
+		virtual ~Entity();
 
+		virtual void Write(serialization::OutputMemoryStream& stream) const;
 		virtual void Read(serialization::InputMemoryStream& stream);
 
-		uint64_t ObjectID() const { return m_objectID; }
+		ObjectID_t ObjectID() const { return m_objectID;  }
+		EntityID_t EntityID() const { return m_entityID; }
 
-		template<typename Component_t, typename ...Args>
+		template<typename Component_t, typename... Args>
 		Component_t& AddComponent(Args... args)
 		{
-			return m_world.Registry().emplace<Component_t>(static_cast<entt::entity>(m_entityID), std::forward<Args>(args)...);
+			return CurrentWorld()->Registry().emplace<Component_t>(static_cast<entt::entity>(m_entityID), std::forward<Args>(args)...);
 		}
 
-		components::Name& Name() { return m_name; }
-		components::Name Name() const { return m_name; }
+	protected:
+		std::shared_ptr<World> CurrentWorld()
+		{
+			NANO_ASSERT(!m_world.expired(), "The world is not valid anymore.");
+			return m_world.lock();
+		}
 
-		components::Position& Position() { return m_state->m_pos; }
-		components::Position Position() const { return m_state->m_pos; }
-
-		components::Rotation& Rotation() { return m_state->m_rot; }
-		components::Rotation Rotation() const { return m_state->m_rot; }
-
-		components::Scale& Scale() { return m_state->m_scale; }
-		components::Scale Scale() const { return m_state->m_scale; }
-		
 	private:
-		World& m_world;
-		uint32_t m_entityID;
+		std::weak_ptr<World> m_world;
 
-		static uint64_t ms_lastObjectID;
-		uint64_t m_objectID;
+		EntityID_t m_entityID;
 
-		components::Name m_name;
+		static ObjectID_t ms_lastObjectID;
+		ObjectID_t m_objectID;
 
-		std::shared_ptr<EntityState> m_state;
-	}; 
+		std::string m_name;
+	};
 }

@@ -6,10 +6,16 @@
 
 namespace nano_engine::engine
 {
+	using EntityIDObscureType = entt::entity;
+
 	class WorldImpl
 	{
 	public:
-		explicit WorldImpl(const std::string& name) {}
+		explicit WorldImpl(const std::string& name)
+		{
+
+		}
+
 		~WorldImpl()
 		{
 			m_registry.clear();
@@ -23,22 +29,28 @@ namespace nano_engine::engine
 			return m_registry;
 		}
 
-		uint32_t CreateEntity()
+		EntityID_t CreateEntity()
 		{
 			return static_cast<uint32_t>(m_registry.create());
+		}
+
+		void DestroyEntity(EntityID_t id)
+		{
+			m_registry.destroy(static_cast<EntityIDObscureType>(id));
 		}
 
 	private:
 		entt::registry m_registry;
 	};
 
-	World::World(const std::string& name) : m_impl(std::make_unique<WorldImpl>(name))
+	World::World(const std::string& name)
 	{
+		m_impl = new WorldImpl(name);
 	}
 
 	World::~World()
 	{
-		m_impl = nullptr;
+		delete m_impl;
 	}
 
 	entt::registry& World::Registry()
@@ -46,8 +58,13 @@ namespace nano_engine::engine
 		return m_impl->Registry();
 	}
 
-	uint32_t World::CreateEntity()
+	EntityID_t World::CreateEntity()
 	{
 		return m_impl->CreateEntity();
+	}
+
+	void World::DestroyEntity(EntityID_t id)
+	{
+		m_impl->DestroyEntity(id);
 	}
 }

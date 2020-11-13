@@ -11,14 +11,15 @@ namespace nano_engine::systems
 	{
 	public:
 		EntitySerializer();
-		virtual ~EntitySerializer();
+		~EntitySerializer();
 
 		EntitySerializer(const EntitySerializer& other) = delete;
 		EntitySerializer(EntitySerializer&& other) = delete;
 
-		void Update(std::chrono::milliseconds deltaTime, engine::World& world) override;
+		void Update(std::chrono::microseconds deltaTime, engine::World& world) override;
 		void EndFrame() override;
+
 	private:
-		std::unique_ptr<EntitySerializerImpl> m_impl;
+		std::shared_ptr<EntitySerializerImpl> m_impl;
 	};
 }

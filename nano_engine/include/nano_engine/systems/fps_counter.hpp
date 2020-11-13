@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano_engine/common.hpp>
+
 #include <nano_engine/systems/system.hpp>
 
 namespace nano_engine::systems
@@ -15,7 +16,7 @@ namespace nano_engine::systems
 		FPSCounter(const FPSCounter& other) = delete;
 		FPSCounter(FPSCounter&& other) = delete;
 
-		void Update(std::chrono::milliseconds deltaTime, engine::World& world) override;
+		virtual void Update(std::chrono::microseconds deltaTime, engine::World& world) override;
 
 	private:
 		std::unique_ptr<FPSCounterImpl> m_impl;

@@ -13,7 +13,7 @@ namespace nano_engine::components
 	public:
 		BoxCollider(float X, float Y, float Z)
 		{
-			m_collisionShape = new btBoxShape(btVector3(btScalar(X / 2.0f), btScalar(Y / 2.0f), btScalar(Z / 2.0f)));
+			m_collisionShape = new btBoxShape(btVector3(btScalar(X/2.0f), btScalar(Y/2.0f), btScalar(Z/2.0f)));
 		}
 	};
 }

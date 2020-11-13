@@ -1,8 +1,5 @@
 #pragma once
 
-#include <nano_engine/serialization/input_memory_stream.hpp>
-#include <nano_engine/serialization/output_memory_stream.hpp>
-
 namespace nano_engine::components
 {
 	struct Rotation
@@ -12,7 +9,7 @@ namespace nano_engine::components
 		float z;
 		float w;
 
-		void Write(serialization::OutputMemoryStream& stream)
+		void Write(serialization::OutputMemoryStream& stream) const
 		{
 			stream.Write(x);
 			stream.Write(y);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nano_engine/components/colliders/collider.hpp>
 #include <nano_engine/components/position.hpp>
+#include <nano_engine/components/colliders/collider.hpp>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -26,7 +26,7 @@ namespace nano_engine::components
 	class RigidBody
 	{
 	public:
-		RigidBody(const Collider& collider, float mass, const Position& pos) : m_localInertia(0, 0, 0)
+		RigidBody(const Collider& collider, float mass, const Position& pos) : m_localInertia(0,0,0)
 		{
 			//Create the state holder
 			m_stateHolder = std::make_shared<RigidBodyHolder>();
@@ -67,15 +67,6 @@ namespace nano_engine::components
 		void IsInWorld(bool inWorld) { m_isInWorld = inWorld; }
 
 		btRigidBody* GetRigidBody() { return m_stateHolder->m_rigidBody; }
-
-		void Position(float x, float y, float z)
-		{
-			btTransform transform;
-			m_stateHolder->m_motionState->getWorldTransform(transform);
-			transform.setOrigin(btVector3(x, y, z));
-			m_stateHolder->m_motionState->setWorldTransform(transform);
-			m_stateHolder->m_rigidBody->setWorldTransform(transform);
-		}
 	private:
 		bool m_isInWorld = false;
 		bool m_isDynamic = false;

@@ -9,14 +9,21 @@ namespace nano_engine::serialization
 	public:
 		OutputMemoryStream()
 		{
+			
 		}
 
 		explicit OutputMemoryStream(size_t initialCapacity) : m_stream(initialCapacity)
 		{
+			
 		}
 
 		size_t Size() const { return m_stream.Size(); }
 		const char* Data() const { return m_stream.Data(); }
+
+		void Reset()
+		{
+			m_stream.Reset();
+		}
 
 		template<typename T>
 		void Write(T data)
@@ -30,7 +37,6 @@ namespace nano_engine::serialization
 		}
 
 		MemoryStream& RawStream() { return m_stream; }
-
 	private:
 		MemoryStream m_stream;
 	};
