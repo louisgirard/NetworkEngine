@@ -2,13 +2,16 @@
 
 #include <nano_engine/engine/entity.hpp>
 
+#include <nano_engine/serialization/input_memory_stream.hpp>
+#include <nano_engine/serialization/output_memory_stream.hpp>
+
+#include <nano_engine/replication/linking_context.hpp>
+
 namespace nano_engine::engine
 {
-	uint64_t Entity::ms_lastObjectID = 0;
-
 	Entity::Entity(std::weak_ptr<World> world, const std::string& name) : m_world(world), m_name(name)
 	{
-		m_objectID = ms_lastObjectID++;
+		m_objectID = replication::LinkingContext::Instance().AddEntity(this);
 
 		m_entityID = CurrentWorld()->CreateEntity();
 		AddComponent<components::Name>(m_name);
@@ -16,6 +19,7 @@ namespace nano_engine::engine
 
 	Entity::~Entity()
 	{
+		replication::LinkingContext::Instance().RemoveEntity(m_objectID);
 		CurrentWorld()->DestroyEntity(m_entityID);
 	}
 
