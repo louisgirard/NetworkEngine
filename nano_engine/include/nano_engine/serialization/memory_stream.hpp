@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <string>
 
+#include <nano_engine/replication/linking_context.hpp>
+
 #include <nano_engine/serialization/endianess.hpp>
 
 namespace nano_engine::serialization
@@ -103,6 +105,13 @@ namespace nano_engine::serialization
 			m_size += dataSize;
 		}
 
+		void Write(const engine::Entity* entity)
+		{
+			if (entity == nullptr) return;
+			auto objectID = replication::LinkingContext::Instance().GetObjectID(const_cast<engine::Entity*>(entity));
+			Write(objectID);
+		}
+
 		template<typename T>
 		T Read()
 		{
@@ -125,6 +134,12 @@ namespace nano_engine::serialization
 			assert(size + m_head <= m_size);
 			std::memcpy(data, m_buffer + m_head, size);
 			m_head += size;
+		}
+
+		engine::Entity* Read()
+		{
+			auto objectID = Read<engine::ObjectID_t>();
+			return replication::LinkingContext::Instance().GetEntity(objectID);
 		}
 
 	private:

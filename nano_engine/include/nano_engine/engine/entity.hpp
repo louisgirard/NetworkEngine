@@ -6,8 +6,11 @@
 
 #include <nano_engine/engine/world.hpp>
 
-#include <nano_engine/serialization/input_memory_stream.hpp>
-#include <nano_engine/serialization/output_memory_stream.hpp>
+namespace nano_engine::serialization
+{
+	class OutputMemoryStream;
+	class InputMemoryStream;
+}
 
 namespace nano_engine::engine
 {
@@ -42,7 +45,6 @@ namespace nano_engine::engine
 
 		EntityID_t m_entityID;
 
-		static ObjectID_t ms_lastObjectID;
 		ObjectID_t m_objectID;
 
 		std::string m_name;
