@@ -6,17 +6,26 @@
 
 #include <nano_engine/engine/world.hpp>
 
+#include <nano_engine/replication/object_creation_registry.hpp>
+
 namespace nano_engine::serialization
 {
 	class OutputMemoryStream;
 	class InputMemoryStream;
 }
 
-#define REPLICATED(id) \
+#define REPLICATED(id, className) \
 enum ClassID_t { classID = id }; \
-constexpr ClassID_t GetClassID() const { return classID; } \
+static constexpr ClassID_t GetClassID() { return classID; } \
 static Entity* CreateEntity(serialization::InputMemoryStream& stream); \
-
+struct __Registrator \
+{ \
+	__Registrator() \
+	{ \
+		replication::ObjectCreationRegistry::Instance().RegisterEntityCreator(GetClassID(), &className::CreateEntity); \
+	} \
+}; \
+static __Registrator ms___registrator; \
 
 namespace nano_engine::engine
 {
@@ -24,7 +33,7 @@ namespace nano_engine::engine
 	class Entity
 	{
 	public:
-		REPLICATED('ENTI');
+		REPLICATED('ENTI', Entity);
 
 		Entity(std::weak_ptr<World> world, const std::string& name);
 		virtual ~Entity();

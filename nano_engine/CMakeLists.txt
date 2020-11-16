@@ -32,7 +32,7 @@ set(NANO_ENGINE_HEADERS
         "include/nano_engine/common/logger.hpp"
         "include/nano_engine/replication/linking_context.hpp"
         "include/nano_engine/replication/replication_manager.hpp"
-        "include/nano_engine/components/replication_component.hpp")
+        "include/nano_engine/components/replication_component.hpp" "include/nano_engine/replication/object_creation_registry.hpp")
 
 set(NANO_ENGINE_SOURCES src/engine/engine.cpp
                         src/systems/fps_counter.cpp 
@@ -47,7 +47,7 @@ set(NANO_ENGINE_SOURCES src/engine/engine.cpp
                         "src/entities/actor.cpp"
                         "src/common/assert.cpp"
                         "src/replication/linking_context.cpp"
-                        "src/replication/replication_manager.cpp")
+                        "src/replication/replication_manager.cpp" "src/replication/object_creation_registry.cpp")
 
 add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 
