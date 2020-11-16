@@ -12,12 +12,20 @@ namespace nano_engine::serialization
 	class InputMemoryStream;
 }
 
+#define REPLICATED(id) \
+enum ClassID_t { classID = id }; \
+constexpr ClassID_t GetClassID() const { return classID; } \
+static Entity* CreateEntity(serialization::InputMemoryStream& stream); \
+
+
 namespace nano_engine::engine
 {
 	using ObjectID_t = uint64_t;
 	class Entity
 	{
 	public:
+		REPLICATED('ENTI');
+
 		Entity(std::weak_ptr<World> world, const std::string& name);
 		virtual ~Entity();
 

@@ -67,6 +67,14 @@ namespace nano_engine::components
 		void IsInWorld(bool inWorld) { m_isInWorld = inWorld; }
 
 		btRigidBody* GetRigidBody() { return m_stateHolder->m_rigidBody; }
+
+		void SetPosition(float x, float y, float z)
+		{
+			auto trans = m_stateHolder->m_rigidBody->getWorldTransform();
+			trans.setOrigin(btVector3(x, y, z));
+			m_stateHolder->m_motionState->setWorldTransform(trans);
+			m_stateHolder->m_rigidBody->setWorldTransform(trans);
+		}
 	private:
 		bool m_isInWorld = false;
 		bool m_isDynamic = false;

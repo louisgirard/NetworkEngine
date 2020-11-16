@@ -22,8 +22,8 @@ namespace nano_engine::entities
 		virtual void Write(serialization::OutputMemoryStream& stream) const override;
 		virtual void Read(serialization::InputMemoryStream& stream) override;
 
-		components::Position& GetPosition() { return *m_position; }
 		const components::Position& GetPosition() const { return *m_position; }
+		virtual void SetPosition(float x, float y, float z);
 
 		components::Rotation& GetRotation() { return *m_rotation; }
 		const components::Rotation& GetRotation() const { return *m_rotation; }
