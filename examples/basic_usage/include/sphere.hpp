@@ -11,9 +11,9 @@ using namespace nano_engine;
 
 class Sphere : public entities::Actor
 {
-	using Base = entities::Actor;
+	using Base = entities::Actor; 
 public:
-	REPLICATED('SPHE');
+	REPLICATED('SPHE', Sphere);
 
 	Sphere(std::weak_ptr<engine::World> world, const std::string& name, float radius);
 

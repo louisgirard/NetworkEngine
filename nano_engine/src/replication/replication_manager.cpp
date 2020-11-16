@@ -3,6 +3,9 @@
 #include <nano_engine/components/replication_component.hpp>
 
 #include <nano_engine/serialization/output_memory_stream.hpp>
+#include <nano_engine/serialization/input_memory_stream.hpp>
+
+#include <nano_engine/replication/object_creation_registry.hpp>
 
 namespace nano_engine::replication
 {
@@ -31,6 +34,25 @@ namespace nano_engine::replication
 			});
 
 		//TODO : send data to network
+
+		//////////////////////////////////
+
+		serialization::InputMemoryStream inputStream(std::move(stream));
+		NANO_ASSERT(inputStream.Read<PacketType>() == PacketType::PKT_REPLICATION_DATA, "Packet is not replication data");
+
+		while (inputStream.Size() > 0)
+		{
+			auto objectID = inputStream.Read<engine::ObjectID_t>();
+			auto classID = inputStream.Read<uint32_t>();
+			auto entity = LinkingContext::Instance().GetEntity(objectID);
+			if (entity == nullptr)
+			{
+				//Create entity
+				entity = ObjectCreationRegistry::Instance().CreateEntity(classID, inputStream);
+				NANO_ASSERT(entity != nullptr, "Entity is not registered in the ObjectRegistry");
+			}
+			entity->Read(inputStream);
+		}
 	};
 
 	void ReplicationManager::EndFrame()

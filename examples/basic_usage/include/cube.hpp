@@ -13,7 +13,7 @@ class Cube : public entities::Actor
 {
 	using Base = entities::Actor;
 public:
-	REPLICATED('CUBE');
+	REPLICATED('CUBE', Cube);
 
 	Cube(std::weak_ptr<engine::World> world, const std::string& name, float size);
 

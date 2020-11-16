@@ -67,7 +67,7 @@ namespace nano_engine::serialization
 			std::free(m_buffer);
 		}
 
-		size_t Size() const { return m_size; }
+		size_t Size() const { return m_size - m_head; }
 		void Size(size_t size) { m_size = size; }
 		const char* Data() const { return m_buffer; }
 

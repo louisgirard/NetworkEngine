@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <chrono>
+#include <cstdint>
 using namespace std::literals::chrono_literals;
 #include <thread>
 #include <string>
