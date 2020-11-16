@@ -7,21 +7,13 @@
 
 #include <nano_engine/systems/fps_counter.hpp>
 #include <nano_engine/systems/entity_viewer.hpp>
-#include <nano_engine/systems/entity_serializer.hpp>
 #include <nano_engine/systems/physic.hpp>
+
+#include <nano_engine/replication/replication_manager.hpp>
 
 #include <nano_engine/engine/engine.hpp>
 #include <nano_engine/engine/world.hpp>
 #include <nano_engine/engine/entity.hpp>
-
-#include <nano_engine/components/position.hpp>
-#include <nano_engine/components/velocity.hpp>
-#include <nano_engine/components/rotation.hpp>
-#include <nano_engine/components/scale.hpp>
-#include <nano_engine/components/rigid_body.hpp>
-
-#include <nano_engine/components/colliders/sphere_collider.hpp>
-#include <nano_engine/components/colliders/box_collider.hpp>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -54,7 +46,7 @@ namespace nano_engine::engine
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
 			m_systems.emplace_back(std::make_unique<systems::Physics>(0, -9.8f, 0));
 			m_systems.emplace_back(std::make_unique<systems::EntityViewer>());
-			m_systems.emplace_back(std::make_unique<systems::EntitySerializer>());
+			m_systems.emplace_back(std::make_unique<replication::ReplicationManager>());
 		}
 
 		void Run()

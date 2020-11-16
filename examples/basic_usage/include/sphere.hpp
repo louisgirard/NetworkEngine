@@ -13,6 +13,8 @@ class Sphere : public entities::Actor
 {
 	using Base = entities::Actor;
 public:
+	REPLICATED('SPHE');
+
 	Sphere(std::weak_ptr<engine::World> world, const std::string& name, float radius);
 
 	virtual void SetPosition(float x, float y, float z) override;

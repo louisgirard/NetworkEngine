@@ -13,6 +13,8 @@ class Cube : public entities::Actor
 {
 	using Base = entities::Actor;
 public:
+	REPLICATED('CUBE');
+
 	Cube(std::weak_ptr<engine::World> world, const std::string& name, float size);
 
 	virtual void SetPosition(float x, float y, float z) override;
