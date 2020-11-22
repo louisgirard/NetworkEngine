@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <string>
 
+#include <nano_engine/engine/entity.hpp>
+
 #include <nano_engine/replication/linking_context.hpp>
 
 #include <nano_engine/serialization/endianess.hpp>
@@ -108,7 +110,7 @@ namespace nano_engine::serialization
 		void Write(const engine::Entity* entity)
 		{
 			if (entity == nullptr) return;
-			auto objectID = replication::LinkingContext::Instance().GetObjectID(const_cast<engine::Entity*>(entity));
+			auto objectID = entity->ObjectID();
 			Write(objectID);
 		}
 
@@ -136,10 +138,10 @@ namespace nano_engine::serialization
 			m_head += size;
 		}
 
-		engine::Entity* Read()
+		engine::Entity* Read(const replication::LinkingContext& linkingContext)
 		{
 			auto objectID = Read<engine::ObjectID_t>();
-			return replication::LinkingContext::Instance().GetEntity(objectID);
+			return linkingContext.GetEntity(objectID);
 		}
 
 	private:

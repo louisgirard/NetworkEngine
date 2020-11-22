@@ -7,6 +7,7 @@
 #include <nano_engine/engine/world.hpp>
 
 #include <nano_engine/replication/object_creation_registry.hpp>
+#include <nano_engine/replication/linking_context.hpp>
 
 namespace nano_engine::serialization
 {
@@ -15,14 +16,14 @@ namespace nano_engine::serialization
 }
 
 #define REPLICATED(id, className) \
-enum ClassID_t { classID = id }; \
-static constexpr ClassID_t GetClassID() { return classID; } \
+enum { classID = id }; \
+virtual uint64_t GetClassID() { return classID; } \
 static Entity* CreateEntity(serialization::InputMemoryStream& stream); \
 struct __Registrator \
 { \
 	__Registrator() \
 	{ \
-		replication::ObjectCreationRegistry::Instance().RegisterEntityCreator(GetClassID(), &className::CreateEntity); \
+		replication::ObjectCreationRegistry::Instance().RegisterEntityCreator(classID, &className::CreateEntity); \
 	} \
 }; \
 static __Registrator ms___registrator; \
@@ -65,5 +66,7 @@ namespace nano_engine::engine
 		ObjectID_t m_objectID;
 
 		std::string m_name;
+
+		static replication::LinkingContext ms_linkingContext;
 	};
 }

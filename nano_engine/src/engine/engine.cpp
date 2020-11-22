@@ -15,11 +15,7 @@
 #include <nano_engine/engine/world.hpp>
 #include <nano_engine/engine/entity.hpp>
 
-#include <portable_socket/portable_socket.hpp>
-
 #include <btBulletDynamicsCommon.h>
-
-using namespace portable_socket;
 
 namespace nano_engine::engine
 {
@@ -31,9 +27,6 @@ namespace nano_engine::engine
 			m_world = std::make_shared<World>("nano_engine");
 
 			FrameLimiter(frameLimit);
-
-			Socket<Protocol::UDP, AddressFamily::IPV4> socket;
-			socket.Bind("0.0.0.0", 40000);
 		}
 
 		~EngineImpl()

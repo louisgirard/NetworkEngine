@@ -1,8 +1,9 @@
 #include <nano_engine/replication/linking_context.hpp>
+#include <nano_engine/engine/entity.hpp>
 
 namespace nano_engine::replication
 {
-	engine::ObjectID_t LinkingContext::GetObjectID(engine::Entity* entity) const
+	uint64_t LinkingContext::GetObjectID(engine::Entity* entity) const
 	{
 		if (auto it = m_entitiesToId.find(entity); it != m_entitiesToId.end())
 		{
@@ -12,7 +13,7 @@ namespace nano_engine::replication
 		return 0;
 	}
 
-	engine::Entity* LinkingContext::GetEntity(const engine::ObjectID_t objectID) const
+	engine::Entity* LinkingContext::GetEntity(const uint64_t objectID) const
 	{
 		if (auto it = m_idToEntities.find(objectID); it != m_idToEntities.end())
 		{
@@ -22,7 +23,7 @@ namespace nano_engine::replication
 		return nullptr;
 	}
 
-	engine::ObjectID_t LinkingContext::AddEntity(engine::Entity* entity)
+	uint64_t LinkingContext::AddEntity(engine::Entity* entity)
 	{
 		if (entity == nullptr) return 0;
 
@@ -45,7 +46,7 @@ namespace nano_engine::replication
 		}
 	}
 
-	void LinkingContext::RemoveEntity(engine::ObjectID_t objectID)
+	void LinkingContext::RemoveEntity(uint64_t objectID)
 	{
 		if (objectID == 0) return;
 

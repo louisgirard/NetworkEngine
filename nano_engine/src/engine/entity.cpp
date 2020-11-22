@@ -9,9 +9,11 @@
 
 namespace nano_engine::engine
 {
+	replication::LinkingContext Entity::ms_linkingContext;
+
 	Entity::Entity(std::weak_ptr<World> world, const std::string& name) : m_world(world), m_name(name)
 	{
-		m_objectID = replication::LinkingContext::Instance().AddEntity(this);
+		m_objectID = ms_linkingContext.AddEntity(this);
 
 		m_entityID = CurrentWorld()->CreateEntity();
 		AddComponent<components::Name>(m_name);
@@ -19,7 +21,7 @@ namespace nano_engine::engine
 
 	Entity::~Entity()
 	{
-		replication::LinkingContext::Instance().RemoveEntity(m_objectID);
+		ms_linkingContext.RemoveEntity(m_objectID);
 		CurrentWorld()->DestroyEntity(m_entityID);
 	}
 
