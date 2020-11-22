@@ -10,7 +10,7 @@ namespace nano_engine::replication
 	class ReplicationManager : public systems::ISystem
 	{
 	public:
-		ReplicationManager();
+		ReplicationManager(bool server, const std::string& ip, uint16_t port);
 		~ReplicationManager();
 
 		void BeginFrame() override;

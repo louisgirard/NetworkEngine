@@ -20,10 +20,12 @@ namespace nano_engine::engine
 		Engine(const Engine& other) = delete;
 		Engine(Engine&& other) = delete;
 
-		void ParseCommandeLine(int argc, char* argv[]);
+		void ParseCommandeLine(const std::string& gameName, int argc, char* argv[]);
 		void Startup();
 		void Run();
 		void Stop();
+
+		bool IsServer() const;
 
 		void FrameLimiter(uint32_t frameRate);
 

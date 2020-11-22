@@ -17,6 +17,8 @@
 
 #include <btBulletDynamicsCommon.h>
 
+#include <cxxopts.hpp> 
+
 namespace nano_engine::engine
 {
 	class EngineImpl
@@ -34,9 +36,19 @@ namespace nano_engine::engine
 			Stop();
 		}
 
-		void ParseCommandeLine(int argc, char* argv[])
+		void ParseCommandeLine(const std::string& gameName, int argc, char* argv[])
 		{
+			cxxopts::Options options(gameName, "CLI of a game built with nano_engine");
+			options.add_options()
+				("s,server", "Run in server mode")
+				("i, ip", "IP on which to listen or connect", cxxopts::value<std::string>()->default_value("127.0.0.1"))
+				("p, port", "Port on which to listen or connect", cxxopts::value<uint16_t>()->default_value("40'000"));
+		
+			auto result = options.parse(argc, argv);
+			m_serverMode = (result.count("server") > 0);
 
+			m_ip = result["ip"].as<std::string>();
+			m_port = result["port"].as<uint16_t>();
 		}
 
 		void Startup()
@@ -46,7 +58,7 @@ namespace nano_engine::engine
 			m_systems.emplace_back(std::make_unique<systems::FPSCounter>());
 			m_systems.emplace_back(std::make_unique<systems::Physics>(0, -9.8f, 0));
 			m_systems.emplace_back(std::make_unique<systems::EntityViewer>());
-			m_systems.emplace_back(std::make_unique<replication::ReplicationManager>());
+			m_systems.emplace_back(std::make_unique<replication::ReplicationManager>(m_serverMode, m_ip, m_port));
 		}
 
 		void Run()
@@ -112,6 +124,11 @@ namespace nano_engine::engine
 			return m_world;
 		}
 
+		bool IsServer() const
+		{
+			return m_serverMode;
+		}
+
 	private:
 		std::atomic_bool m_stop = true;
 
@@ -122,6 +139,10 @@ namespace nano_engine::engine
 		uint32_t m_fixedFrameRate = 0;
 
 		std::chrono::microseconds m_frameDuration = 0us;
+
+		bool m_serverMode = false;
+		std::string m_ip = "";
+		uint16_t m_port = 0;
 	};
 
 	Engine::Engine()
@@ -134,9 +155,9 @@ namespace nano_engine::engine
 		m_impl = nullptr;
 	}
 
-	void Engine::ParseCommandeLine(int argc, char* argv[])
+	void Engine::ParseCommandeLine(const std::string& gameName, int argc, char* argv[])
 	{
-		m_impl->ParseCommandeLine(argc, argv);
+		m_impl->ParseCommandeLine(gameName, argc, argv);
 	}
 
 	void Engine::Startup()
@@ -162,5 +183,10 @@ namespace nano_engine::engine
 	std::weak_ptr<World> Engine::GetWorld()
 	{
 		return m_impl->GetWorld();
+	}
+
+	bool Engine::IsServer() const
+	{
+		return m_impl->IsServer();
 	}
 }

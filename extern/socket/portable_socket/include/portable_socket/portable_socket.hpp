@@ -56,7 +56,15 @@ namespace portable_socket
 #endif
 
 	enum class Protocol { UDP, TCP };
+
 	enum class AddressFamily { IPV4, IPV6 };
+
+	struct RecvFromResult
+	{
+		size_t receivedSize;
+		std::string fromIp;
+		uint16_t fromPort;
+	};
 
 	template<Protocol proto, AddressFamily af>
 	class Socket
@@ -179,7 +187,7 @@ namespace portable_socket
 			return result;
 		}
 
-		std::optional<size_t> SendTo(const std::string& to, uint16_t port, char* data, size_t size)
+		std::optional<size_t> SendTo(const std::string& to, uint16_t port, const char* data, size_t size)
 		{
 			if constexpr (proto == Protocol::TCP) { return {}; }
 			if (m_socket == INVALID_SOCKET) { return {}; }
@@ -193,21 +201,25 @@ namespace portable_socket
 			return result;
 		}
 
-		std::optional<size_t> ReceiveFrom(char* data, size_t size, sockaddr* from, int* fromlen)
+		std::optional<RecvFromResult> ReceiveFrom(char* data, size_t size)
 		{
 			if constexpr (proto == Protocol::TCP) { return {}; }
 			if (m_socket == INVALID_SOCKET) { return {}; }
 
-			int result = recvfrom(m_socket, data, size, 0, from, fromlen);
+			RecvFromResult result;
+			sockaddr* from = nullptr;
 
-			if (result < 0)
+			result.receivedSize = recvfrom(m_socket, data, size, 0, from, nullptr);
+			GetIpPort(from, result.fromIp, result.fromPort);
+
+			if (result.receivedSize < 0)
 			{
 				return {};
 			}
 			return result;
 		}
 
-		static bool Select(std::vector<std::shared_ptr<Socket<proto, af>>>& read,
+		static int Select(std::vector<std::shared_ptr<Socket<proto, af>>>& read,
 			std::vector<std::shared_ptr<Socket<proto, af>>>& write,
 			std::vector<std::shared_ptr<Socket<proto, af>>>& except)
 		{
@@ -221,7 +233,7 @@ namespace portable_socket
 			fd_set exceptFDSet;
 			FD_ZERO(&exceptFDSet);
 
-			struct timeval timeout = { 1,0 };
+			struct timeval timeout = { 0,100 };
 
 			for (auto& s : read)
 			{
@@ -260,7 +272,7 @@ namespace portable_socket
 				i--;
 			}
 
-			return ret >= 0;
+			return ret;
 		}
 
 	private:
@@ -281,6 +293,32 @@ namespace portable_socket
 				addr.sin6_port = htons(port);
 				inet_pton(AF_INET6, ipAddr.c_str(), &addr.sin6_addr);
 				return addr;
+			}
+		}
+
+		static constexpr void GetIpPort(sockaddr* addr, std::string& from, uint16_t& port)
+		{
+			if constexpr (af == AddressFamily::IPV4)
+			{
+				struct sockaddr_in* addrIn = (struct sockaddr_in*)&addr;
+				struct in_addr ipAddr = addrIn->sin_addr;
+
+				char ip[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &ipAddr, ip, INET_ADDRSTRLEN);
+
+				from = ip;
+				port = ntohs(addrIn->sin_port);
+			}
+			else
+			{
+				struct sockaddr_in6* addrIn = (struct sockaddr_in6*)&addr;
+				struct in6_addr ipAddr = addrIn->sin_addr;
+
+				char ip[INET6_ADDRSTRLEN];
+				inet_ntop(AF_INET6, &ipAddr, ip, INET6_ADDRSTRLEN);
+
+				from = ip;
+				port = ntohs(addrIn->sin_port);
 			}
 		}
 

@@ -17,7 +17,7 @@ namespace nano_engine::serialization
 
 #define REPLICATED(id, className) \
 enum { classID = id }; \
-virtual uint64_t GetClassID() { return classID; } \
+virtual uint32_t GetClassID() { return classID; } \
 static Entity* CreateEntity(serialization::InputMemoryStream& stream); \
 struct __Registrator \
 { \
