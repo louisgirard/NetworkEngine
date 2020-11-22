@@ -54,6 +54,8 @@ add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 target_include_directories(nano_engine INTERFACE include)
 target_include_directories(nano_engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+target_link_libraries(nano_engine PRIVATE portable_socket)
+
 target_link_libraries(nano_engine PUBLIC CONAN_PKG::spdlog)
 target_link_libraries(nano_engine PUBLIC CONAN_PKG::entt)
 target_link_libraries(nano_engine PRIVATE CONAN_PKG::bullet3)
