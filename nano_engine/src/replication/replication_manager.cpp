@@ -33,6 +33,8 @@ namespace nano_engine::replication
 			m_serverIp = ip;
 			m_serverPort = port;
 
+			memset(m_rxBuffer, 0, RXBufferSize);
+
 			if (m_server)
 			{
 				m_socket->Bind(ip, port);
@@ -42,7 +44,7 @@ namespace nano_engine::replication
 			//Create connection packet
 			char packet[1];
 			packet[0] = PacketType::PKT_HELLO;
-			m_socket->SendTo(m_serverIp, m_serverPort, nullptr, 0);
+			m_socket->SendTo(m_serverIp, m_serverPort, packet, 1);
 		}
 
 		void BeginFrame()
@@ -54,7 +56,8 @@ namespace nano_engine::replication
 		{
 			m_read.push_back(m_socket);
 
-			portable_socket::RecvFromResult socketResult{};
+			portable_socket::RecvFromResult socketResult;
+			memset(&socketResult, 0, sizeof(socketResult));
 
 			if (ReplicationSocket::Select(m_read, m_write, m_except) > 0)
 			{

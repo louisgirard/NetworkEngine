@@ -62,7 +62,7 @@ namespace portable_socket
 	struct RecvFromResult
 	{
 		size_t receivedSize;
-		std::string fromIp;
+		char fromIp[INET6_ADDRSTRLEN];
 		uint16_t fromPort;
 	};
 
@@ -207,10 +207,30 @@ namespace portable_socket
 			if (m_socket == INVALID_SOCKET) { return {}; }
 
 			RecvFromResult result;
-			sockaddr* from = nullptr;
 
-			result.receivedSize = recvfrom(m_socket, data, size, 0, from, nullptr);
-			GetIpPort(from, result.fromIp, result.fromPort);
+			int err;
+			if constexpr (af == AddressFamily::IPV4)
+			{
+				struct sockaddr_in addr {};
+				int fromlen = sizeof(addr);
+				memset(&addr, 0, sizeof(addr));
+				addr.sin_family = AF_INET;
+				err = recvfrom(m_socket, data, size, 0, (sockaddr*)&addr, &fromlen);
+				inet_ntop(addr.sin_family, (void*)&addr.sin_addr, result.fromIp, INET6_ADDRSTRLEN);
+				result.fromPort = ntohs(addr.sin_port);
+				result.receivedSize = (err >= 0) ? err : 0;
+			}
+			else
+			{
+				struct sockaddr_in6 addr {};
+				int fromlen = sizeof(addr);
+				memset(&addr, 0, sizeof(addr));
+				addr.sin_family = AF_INET6;
+				err = recvfrom(m_socket, data, size, 0, (sockaddr*)&addr, &fromlen);
+				inet_ntop(addr.sin_family, (void*)&addr.sin_addr, result.fromIp, INET6_ADDRSTRLEN);
+				result.fromPort = ntohs(addr.sin_port);
+				result.receivedSize = (err >= 0) ? err : 0;
+			}
 
 			if (result.receivedSize < 0)
 			{
@@ -293,32 +313,6 @@ namespace portable_socket
 				addr.sin6_port = htons(port);
 				inet_pton(AF_INET6, ipAddr.c_str(), &addr.sin6_addr);
 				return addr;
-			}
-		}
-
-		static constexpr void GetIpPort(sockaddr* addr, std::string& from, uint16_t& port)
-		{
-			if constexpr (af == AddressFamily::IPV4)
-			{
-				struct sockaddr_in* addrIn = (struct sockaddr_in*)&addr;
-				struct in_addr ipAddr = addrIn->sin_addr;
-
-				char ip[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &ipAddr, ip, INET_ADDRSTRLEN);
-
-				from = ip;
-				port = ntohs(addrIn->sin_port);
-			}
-			else
-			{
-				struct sockaddr_in6* addrIn = (struct sockaddr_in6*)&addr;
-				struct in6_addr ipAddr = addrIn->sin_addr;
-
-				char ip[INET6_ADDRSTRLEN];
-				inet_ntop(AF_INET6, &ipAddr, ip, INET6_ADDRSTRLEN);
-
-				from = ip;
-				port = ntohs(addrIn->sin_port);
 			}
 		}
 
