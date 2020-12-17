@@ -9,29 +9,14 @@
 
 namespace nano_engine::engine
 {
-	replication::LinkingContext Entity::ms_linkingContext;
-
-	Entity::Entity(std::weak_ptr<World> world, const std::string& name) : m_world(world), m_name(name)
+	Entity::Entity(engine::World& world, const std::string& name) : m_world(world), m_name(name)
 	{
-		m_objectID = ms_linkingContext.AddEntity(this);
-
-		m_entityID = CurrentWorld()->CreateEntity();
+		m_entityID = m_world.CreateEntity();
 		AddComponent<components::Name>(m_name);
 	}
 
 	Entity::~Entity()
 	{
-		ms_linkingContext.RemoveEntity(m_objectID);
-		CurrentWorld()->DestroyEntity(m_entityID);
-	}
-
-	void Entity::Write(serialization::OutputMemoryStream& stream) const
-	{
-		stream.Write(m_objectID);
-	}
-
-	void Entity::Read(serialization::InputMemoryStream& stream)
-	{
-		assert(stream.Read<ObjectID_t>() == m_objectID);
+		m_world.DestroyEntity(m_entityID);
 	}
 }

@@ -119,7 +119,7 @@ namespace nano_engine::engine
 			m_stop = true;
 		}
 
-		std::weak_ptr<World> GetWorld()
+		std::shared_ptr<World> GetWorld()
 		{
 			return m_world;
 		}
@@ -180,7 +180,7 @@ namespace nano_engine::engine
 		m_impl->FrameLimiter(frameRate);
 	}
 
-	std::weak_ptr<World> Engine::GetWorld()
+	std::shared_ptr<World> Engine::GetWorld()
 	{
 		return m_impl->GetWorld();
 	}

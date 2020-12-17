@@ -34,6 +34,16 @@ namespace nano_engine::replication
 		return objectID;
 	}
 
+	void LinkingContext::AddEntity(engine::Entity* entity, uint64_t objectID)
+	{
+		if (entity == nullptr) return;
+
+		m_idToEntities.insert(std::make_pair(objectID, entity));
+		m_entitiesToId.insert(std::make_pair(entity, objectID));
+
+		m_nextObjectID = objectID;
+	}
+
 	void LinkingContext::RemoveEntity(engine::Entity* entity)
 	{
 		if (entity == nullptr) return;

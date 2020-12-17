@@ -107,13 +107,6 @@ namespace nano_engine::serialization
 			m_size += dataSize;
 		}
 
-		void Write(const engine::Entity* entity)
-		{
-			if (entity == nullptr) return;
-			auto objectID = entity->ObjectID();
-			Write(objectID);
-		}
-
 		template<typename T>
 		T Read()
 		{
@@ -136,12 +129,6 @@ namespace nano_engine::serialization
 			assert(size + m_head <= m_size);
 			std::memcpy(data, m_buffer + m_head, size);
 			m_head += size;
-		}
-
-		engine::Entity* Read(const replication::LinkingContext& linkingContext)
-		{
-			auto objectID = Read<engine::ObjectID_t>();
-			return linkingContext.GetEntity(objectID);
 		}
 
 	private:

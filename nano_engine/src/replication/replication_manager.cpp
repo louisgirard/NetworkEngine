@@ -8,6 +8,9 @@
 #include <nano_engine/replication/linking_context.hpp>
 #include <nano_engine/replication/object_creation_registry.hpp>
 
+#include <nano_engine/entities/cube.hpp>
+#include <nano_engine/entities/sphere.hpp>
+
 #include <portable_socket/portable_socket.hpp>
 
 namespace nano_engine::replication
@@ -21,7 +24,7 @@ namespace nano_engine::replication
 		{
 			PKT_HELLO,
 			PKT_REPLICATION_DATA,
-			PKY_BYE,
+			PKT_BYE,
 			PKT_COUNT
 		};
 	public:
@@ -69,13 +72,20 @@ namespace nano_engine::replication
 
 			if (!m_server)
 			{
-				//Read socket
-				//Interpret replication packet
-
+				if (socketResult.receivedSize > 0)
+				{
+					UpdateClient(socketResult, world);
+				}
 			}
 			else
 			{
 				UpdateServer(socketResult, world);
+
+				/*world.Registry().view<components::ReplicationComponent, components::Position>().each([this](components::ReplicationComponent& replication, components::Position& pos)
+					{
+						entities::Actor* actor = dynamic_cast<entities::Actor*>(replication.Entity());
+						actor->SetPosition(0, 0, 0);
+					});*/
 			}
 			
 		}
@@ -105,7 +115,41 @@ namespace nano_engine::replication
 
 		void UpdateClient(const portable_socket::RecvFromResult& sockResult, engine::World& world)
 		{
+			//Read socket
+			serialization::InputMemoryStream stream(m_rxBuffer, sockResult.receivedSize);
 
+			//Interpret replication packet
+			uint8_t packetType = stream.Read<uint8_t>();
+			if (packetType != PacketType::PKT_REPLICATION_DATA) return;
+
+			while (stream.Size() > 0)
+			{
+				uint64_t netID = stream.Read<uint64_t>();
+				uint32_t classID = stream.Read<uint32_t>();
+				engine::Entity* entity = m_linkingContext.GetEntity(netID);
+				if (entity != nullptr)
+				{
+					entity->Read(stream);
+				}
+				else
+				{
+					// Entity does not exist, create it
+					if (classID == 'CUBE')
+					{
+						// Create Cube
+						entities::Cube* cube = new entities::Cube(world, "Cube", 0);
+						cube->Read(stream);
+						m_linkingContext.AddEntity(cube, netID);
+					}
+					else if (classID == 'SPHE')
+					{
+						// Create Sphere
+						entities::Sphere* sphere = new entities::Sphere(world, "Sphere", 0);
+						sphere->Read(stream);
+						m_linkingContext.AddEntity(sphere, netID);
+					}
+				}
+			}
 		}
 
 		void UpdateServer(const portable_socket::RecvFromResult& sockResult, engine::World& world)
@@ -116,7 +160,7 @@ namespace nano_engine::replication
 				//If connected and data received check if disconnection
 				if (m_isConnected)
 				{
-					m_isConnected = (m_rxBuffer[0] == PacketType::PKY_BYE);
+					m_isConnected = (m_rxBuffer[0] == PacketType::PKT_BYE);
 				}
 				else
 				{
@@ -143,6 +187,7 @@ namespace nano_engine::replication
 
 					stream.Write(netID);
 					stream.Write(replication.Entity()->GetClassID());
+
 					replication.Entity()->Write(stream);
 				});
 

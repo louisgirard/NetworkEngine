@@ -32,11 +32,6 @@ namespace nano_engine::serialization
 			m_stream.Read(data, dataSize);
 		}
 
-		engine::Entity* Read(const replication::LinkingContext& linkingContext)
-		{
-			return m_stream.Read(linkingContext);
-		}
-
 	private:
 		MemoryStream m_stream;
 	};

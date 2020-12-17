@@ -54,8 +54,7 @@ namespace nano_engine::components
 			m_stateHolder->m_motionState = new btDefaultMotionState(startTransform);
 
 			//Create the rigidbody
-			btRigidBody::btRigidBodyConstructionInfo rbInfo(btMass, m_stateHolder->m_motionState, m_stateHolder->m_collisionShape, m_localInertia);
-			m_stateHolder->m_rigidBody = new btRigidBody(rbInfo);
+			m_stateHolder->m_rigidBody = new btRigidBody(btMass, m_stateHolder->m_motionState, m_stateHolder->m_collisionShape, m_localInertia);
 		}
 
 		~RigidBody()

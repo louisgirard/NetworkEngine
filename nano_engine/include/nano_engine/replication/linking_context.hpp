@@ -20,6 +20,7 @@ namespace nano_engine::replication
 		engine::Entity* GetEntity(const uint64_t objectID) const;
 
 		uint64_t AddEntity(engine::Entity* entity);
+		void AddEntity(engine::Entity* entity, uint64_t objectID);
 		void RemoveEntity(engine::Entity* entity);
 		void RemoveEntity(uint64_t objectID);
 

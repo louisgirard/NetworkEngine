@@ -29,7 +29,7 @@ namespace nano_engine::engine
 
 		void FrameLimiter(uint32_t frameRate);
 
-		std::weak_ptr<World> GetWorld();
+		std::shared_ptr<World> GetWorld();
 	private:
 		Engine();
 

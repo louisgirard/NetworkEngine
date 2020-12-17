@@ -2,7 +2,7 @@
 
 namespace nano_engine::entities
 {
-	Actor::Actor(std::weak_ptr<engine::World> world, const std::string& name) : BaseClass(world, name)
+	Actor::Actor(engine::World& world, const std::string& name) : BaseClass(world, name)
 	{
 		m_position = AddComponent<components::Position>(0.f, 0.f, 0.f);
 		m_rotation = AddComponent<components::Rotation>(0.f, 0.f, 0.f, 0.f);

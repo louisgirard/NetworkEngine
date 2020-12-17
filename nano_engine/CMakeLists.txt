@@ -27,12 +27,15 @@ set(NANO_ENGINE_HEADERS
         "include/nano_engine/engine/entity.hpp" 
         "include/nano_engine/components/scale.hpp" 
         "include/nano_engine/entities/actor.hpp" 
+        "include/nano_engine/entities/cube.hpp" 
+        "include/nano_engine/entities/sphere.hpp" 
         "include/nano_engine/common/reference.hpp" 
         "include/nano_engine/common/assert.hpp" 
         "include/nano_engine/common/logger.hpp"
         "include/nano_engine/replication/linking_context.hpp"
         "include/nano_engine/replication/replication_manager.hpp"
-        "include/nano_engine/components/replication_component.hpp" "include/nano_engine/replication/object_creation_registry.hpp")
+        "include/nano_engine/components/replication_component.hpp"
+        "include/nano_engine/replication/object_creation_registry.hpp")
 
 set(NANO_ENGINE_SOURCES src/engine/engine.cpp
                         src/systems/fps_counter.cpp 
@@ -45,9 +48,12 @@ set(NANO_ENGINE_SOURCES src/engine/engine.cpp
                         "src/systems/entity_serializer.cpp" 
                         "src/engine/entity.cpp" 
                         "src/entities/actor.cpp"
+                        "src/entities/cube.cpp"
+                        "src/entities/sphere.cpp"
                         "src/common/assert.cpp"
                         "src/replication/linking_context.cpp"
-                        "src/replication/replication_manager.cpp" "src/replication/object_creation_registry.cpp")
+                        "src/replication/replication_manager.cpp"
+                        "src/replication/object_creation_registry.cpp")
 
 add_library(nano_engine STATIC ${NANO_ENGINE_HEADERS} ${NANO_ENGINE_SOURCES})
 
