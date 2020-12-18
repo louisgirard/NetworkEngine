@@ -1,13 +1,9 @@
-#include <entt/entt.hpp>
-
 #include <nano_engine/engine/entity.hpp>
 
 #include <nano_engine/engine/world.hpp>
 
 namespace nano_engine::engine
 {
-	using EntityIDObscureType = entt::entity;
-
 	class WorldImpl
 	{
 	public:
@@ -18,29 +14,29 @@ namespace nano_engine::engine
 
 		~WorldImpl()
 		{
-			m_registry.clear();
+			m_entities.clear();
 		}
 
 		WorldImpl(const WorldImpl& other) = delete;
 		WorldImpl(WorldImpl&& other) = delete;
 
-		entt::registry& Registry()
+		void CreateEntity(Entity* entity)
 		{
-			return m_registry;
+			m_entities.push_back(entity);
 		}
 
-		EntityID_t CreateEntity()
+		void DestroyEntity(Entity* entity)
 		{
-			return static_cast<uint32_t>(m_registry.create());
+			m_entities.erase(std::remove(m_entities.begin(), m_entities.end(), entity), m_entities.end());
 		}
 
-		void DestroyEntity(EntityID_t id)
+		std::vector<Entity*>& Entities()
 		{
-			m_registry.destroy(static_cast<EntityIDObscureType>(id));
+			return m_entities;
 		}
 
 	private:
-		entt::registry m_registry;
+		std::vector<Entity*> m_entities;
 	};
 
 	World::World(const std::string& name)
@@ -53,18 +49,18 @@ namespace nano_engine::engine
 		delete m_impl;
 	}
 
-	entt::registry& World::Registry()
+	void World::CreateEntity(Entity* entity)
 	{
-		return m_impl->Registry();
+		m_impl->CreateEntity(entity);
 	}
 
-	EntityID_t World::CreateEntity()
+	void World::DestroyEntity(Entity* entity)
 	{
-		return m_impl->CreateEntity();
+		m_impl->DestroyEntity(entity);
 	}
 
-	void World::DestroyEntity(EntityID_t id)
+	std::vector<Entity*>& World::Entities()
 	{
-		m_impl->DestroyEntity(id);
+		return m_impl->Entities();
 	}
 }

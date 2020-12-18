@@ -5,8 +5,6 @@
 #include <type_traits>
 #include <string>
 
-#include <nano_engine/engine/entity.hpp>
-
 #include <nano_engine/replication/linking_context.hpp>
 
 #include <nano_engine/serialization/endianess.hpp>

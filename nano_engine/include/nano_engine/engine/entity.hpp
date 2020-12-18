@@ -9,11 +9,13 @@
 #include <nano_engine/replication/object_creation_registry.hpp>
 #include <nano_engine/replication/linking_context.hpp>
 
-namespace nano_engine::serialization
-{
-	class OutputMemoryStream;
-	class InputMemoryStream;
-}
+#include <nano_engine/components/name.hpp>
+#include <nano_engine/components/position.hpp>
+#include <nano_engine/components/rotation.hpp>
+#include <nano_engine/components/scale.hpp>
+
+#include <nano_engine/components/rigid_body.hpp>
+
 
 #define REPLICATED(id, className) \
 enum { classID = id }; \
@@ -39,23 +41,32 @@ namespace nano_engine::engine
 		Entity(engine::World& world, const std::string& name);
 		virtual ~Entity();
 
-		virtual void Write(serialization::OutputMemoryStream& stream) const {}
-		virtual void Read(serialization::InputMemoryStream& stream) {}
+		virtual void Write(serialization::OutputMemoryStream& stream) const;
+		virtual void Read(serialization::InputMemoryStream& stream);
 
-		EntityID_t EntityID() const { return m_entityID; }
+		const components::Position& GetPosition() const { return m_position; }
+		virtual void SetPosition(float x, float y, float z);
 
-		template<typename Component_t, typename... Args>
-		Component_t& AddComponent(Args... args)
-		{
-			entt::entity id = static_cast<entt::entity>(m_entityID);
-			return m_world.Registry().emplace<Component_t>(static_cast<entt::entity>(m_entityID), std::forward<Args>(args)...);
-		}
+		components::Rotation& GetRotation() { return m_rotation; }
+		const components::Rotation& GetRotation() const { return m_rotation; }
+
+		components::Scale& GetScale() { return m_scale; }
+		const components::Scale& GetScale() const { return m_scale; }
+
+		const components::Name& GetName() const { return m_name; }
+
+		virtual components::RigidBody* GetRigidBody() { return nullptr; }
+
+		bool Replicate() { return m_replicate; }
+	protected:
+		bool m_replicate = false;
 
 	private:
 		World& m_world;
 
-		EntityID_t m_entityID;
-
-		std::string m_name;
+		components::Name m_name;
+		components::Position m_position;
+		components::Rotation m_rotation;
+		components::Scale m_scale;
 	};
 }

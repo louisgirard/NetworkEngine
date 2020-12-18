@@ -2,10 +2,7 @@
 
 #include <nano_engine/systems/physic.hpp>
 
-#include <entt/entt.hpp>
-
-#include <nano_engine/components/position.hpp>
-#include <nano_engine/components/rigid_body.hpp>
+#include <nano_engine/engine/entity.hpp>
 
 namespace nano_engine::systems
 {
@@ -35,35 +32,40 @@ namespace nano_engine::systems
 		{
 			m_lastStepTime += deltaTime;
 			if (m_lastStepTime < 1'000'000us / 60) return;
-			
-			auto view = world.Registry().view<components::RigidBody>();
-			for (auto entity : view)
+
+			for (auto it = world.Entities().begin(); it != world.Entities().end(); it++)
 			{
-				auto& body = view.get<components::RigidBody>(entity);
-				if (!body.IsInWorld())
+				auto body = (*it)->GetRigidBody();
+				if (body != nullptr && !body->IsInWorld())
 				{
-					m_dynamicsWorld->addRigidBody(body.GetRigidBody());
-					body.IsInWorld(true);
+					m_dynamicsWorld->addRigidBody(body->GetRigidBody());
+					body->IsInWorld(true);
 				}
 			}
 
 			//Update the physic world
 			m_dynamicsWorld->stepSimulation(m_lastStepTime.count()/1'000'000.0f, 10);
-			world.Registry().view<components::Position, components::RigidBody>().each([this](components::Position& pos, components::RigidBody& body)
+			for (auto it = world.Entities().begin(); it != world.Entities().end(); it++)
+			{
+				btTransform trans;
+				auto body = (*it)->GetRigidBody();
+				if (body == nullptr) return;
+
+				if (body->GetRigidBody() && body->GetRigidBody()->getMotionState())
 				{
-					btTransform trans;
-					if (body.GetRigidBody() && body.GetRigidBody()->getMotionState())
-					{
-						body.GetRigidBody()->getMotionState()->getWorldTransform(trans);
-					}
-					else
-					{
-						trans = body.GetRigidBody()->getWorldTransform();
-					}
-					pos.x = trans.getOrigin().getX();
-					pos.y = trans.getOrigin().getY();
-					pos.z = trans.getOrigin().getZ();
-				});
+					body->GetRigidBody()->getMotionState()->getWorldTransform(trans);
+				}
+				else
+				{
+					trans = body->GetRigidBody()->getWorldTransform();
+				}
+				components::Position pos;
+				pos.x = trans.getOrigin().getX();
+				pos.y = trans.getOrigin().getY();
+				pos.z = trans.getOrigin().getZ();
+
+				(*it)->SetPosition(pos.x, pos.y, pos.z);
+			}
 
 			m_lastStepTime = 0ms;
 		}

@@ -1,7 +1,5 @@
 #include <nano_engine/replication/replication_manager.hpp>
 
-#include <nano_engine/components/replication_component.hpp>
-
 #include <nano_engine/serialization/output_memory_stream.hpp>
 #include <nano_engine/serialization/input_memory_stream.hpp>
 
@@ -80,12 +78,6 @@ namespace nano_engine::replication
 			else
 			{
 				UpdateServer(socketResult, world);
-
-				/*world.Registry().view<components::ReplicationComponent, components::Position>().each([this](components::ReplicationComponent& replication, components::Position& pos)
-					{
-						entities::Actor* actor = dynamic_cast<entities::Actor*>(replication.Entity());
-						actor->SetPosition(0, 0, 0);
-					});*/
 			}
 			
 		}
@@ -177,19 +169,22 @@ namespace nano_engine::replication
 			serialization::OutputMemoryStream stream;
 			stream.Write(PacketType::PKT_REPLICATION_DATA);
 
-			world.Registry().view<components::ReplicationComponent>().each([&](components::ReplicationComponent& replication)
+			for (auto it = world.Entities().begin(); it != world.Entities().end(); it++)
+			{
+				auto entity = (*it);
+				if (!entity->Replicate()) continue;
+
+				auto netID = m_linkingContext.GetObjectID(entity);
+				if (netID == 0)
 				{
-					auto netID = m_linkingContext.GetObjectID(replication.Entity());
-					if (netID == 0)
-					{
-						netID = m_linkingContext.AddEntity(replication.Entity());
-					}
+					netID = m_linkingContext.AddEntity(entity);
+				}
 
-					stream.Write(netID);
-					stream.Write(replication.Entity()->GetClassID());
+				stream.Write(netID);
+				stream.Write(entity->GetClassID());
 
-					replication.Entity()->Write(stream);
-				});
+				entity->Write(stream);
+			}
 
 			//Send data to network
 			m_socket->SendTo(m_clientIp, m_clientPort, stream.Data(), stream.Size());

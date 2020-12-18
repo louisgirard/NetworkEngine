@@ -6,15 +6,15 @@ namespace nano_engine::entities
 		Base(world, name),
 		m_radius(radius)
 	{
-		m_collider = AddComponent<components::SphereCollider>(m_radius);
-		m_rigidBody = AddComponent<components::RigidBody>(m_collider.Get(), 1.0f, GetPosition());
-		m_replication = AddComponent<components::ReplicationComponent>(this);
+		m_replicate = true;
+		m_collider = std::make_shared<components::SphereCollider>(m_radius);
+		m_rigidBody = std::make_shared<components::RigidBody>(*m_collider.get(), 1.0f, GetPosition());
 	}
 
 	void Sphere::SetPosition(float x, float y, float z)
 	{
 		Base::SetPosition(x, y, z);
-		m_rigidBody.Get().SetPosition(x, y, z);
+		m_rigidBody->SetPosition(x, y, z);
 	}
 
 	void Sphere::Write(serialization::OutputMemoryStream& stream) const

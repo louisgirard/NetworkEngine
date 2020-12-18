@@ -1,5 +1,8 @@
 #pragma once
 
+#include <nano_engine/serialization/input_memory_stream.hpp>
+#include <nano_engine/serialization/output_memory_stream.hpp>
+
 namespace nano_engine::components
 {
 	struct Rotation
